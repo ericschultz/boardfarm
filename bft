@@ -69,15 +69,25 @@ def main():
             if config.board.get('wan_device'):
                 config.wan = debian.DebianBox(config.board.get('wan_device'),
                                               color='cyan', reboot=config.reboot_vms,
-                                              location=config.board.get('location'))
+                                              location=config.board.get('location'),
+                                              username=config.board.get('wan_username', None), password=config.board.get('wan_password', None),
+                                              port=config.board.get('wan_port', None))
             if config.board.get('lan_device'):
-                config.lan = debian.DebianBox(config.board.get('lan_device'), color='blue', reboot=config.reboot_vms)
+                config.lan = debian.DebianBox(config.board.get('lan_device'), color='blue', reboot=config.reboot_vms,
+                                              username=config.board.get('lan_username', None), password=config.board.get('lan_password', None),
+                                              port=config.board.get('lan_port', None))
             if config.board.get('wlan_device'):
-                config.wlan = debian.DebianBox(config.board.get('wlan_device'), color='green', reboot=config.reboot_vms)
+                config.wlan = debian.DebianBox(config.board.get('wlan_device'), color='green', reboot=config.reboot_vms,
+                                                username=config.board.get('wlan_username', None), password=config.board.get('wlan_password', None),
+                                                port=config.board.get('wlan_port', None))
             if config.board.get('5g_device'):
-                config.wlan5g = debian.DebianBox(config.board.get('5g_device'), color='grey', reboot=config.reboot_vms)
+                config.wlan5g = debian.DebianBox(config.board.get('5g_device'), color='grey', reboot=config.reboot_vms,
+                                                 username=config.board.get('5g_username', None), password=config.board.get('5g_password', None),
+                                                 port=config.board.get('5g_port', None))
             if config.board.get('2g_device'):
-                config.wlan2g = debian.DebianBox(config.board.get('2g_device'), color='magenta', reboot=config.reboot_vms)
+                config.wlan2g = debian.DebianBox(config.board.get('2g_device'), color='magenta', reboot=config.reboot_vms,
+                                                 username=config.board.get('2g_username', None), password=config.board.get('2g_password', None),
+                                                 port=config.board.get('2g_port', None))
 
         except Exception as e:
             print(e)
