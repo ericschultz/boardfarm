@@ -24,13 +24,20 @@ class DebianBox(base.BaseDevice):
                  name,
                  color,
                  output=sys.stdout,
-                 username='root',
-                 password='bigfoot1',
-                 port="22",
+                 username=None,
+                 password=None,
+                 port=None,
                  reboot=False,
                  location=None):
         if name is None:
             return
+        if username is None:
+            username='root'
+        if password is None:
+            password='bigfoot1'
+        if port is None:
+            port='22'
+
         pexpect.spawn.__init__(self,
                                command="ssh",
                                args=['%s@%s' % (username, name),
