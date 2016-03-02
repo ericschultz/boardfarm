@@ -18,7 +18,7 @@ class DebianBox(base.BaseDevice):
     A linux machine running an ssh server.
     '''
 
-    prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #" ]
+    prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$" ]
 
     def __init__(self,
                  name,
