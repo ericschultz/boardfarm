@@ -147,7 +147,7 @@ class APCPower(PowerDevice):
         pcon.send("" + "\r\n")
         pcon.expect("> ")
 
-class DLIPowerSwitch(PowerDevice)
+class DLIPowerSwitch(PowerDevice):
     '''Resets a DLI based power switch'''
     def __init__(self,
                  ip_address,
