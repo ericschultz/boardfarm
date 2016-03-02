@@ -55,5 +55,5 @@ class BridgedMode(rootfs_boot.RootFSBootTest):
         board.network_restart()
         board.firewall_restart()
 
-        lan.sendline('ifconfig eth1 192.168.0.2')
+        lan.run_ifconfig('eth1 192.168.0.2')
         lan.expect(prompt)

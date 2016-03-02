@@ -72,14 +72,14 @@ class WlanAssociate(wlan_set_ssid.WlanSetSSID):
         wlan.sendline('rfkill unblock all')
         wlan.expect(prompt)
 
-        wlan.sendline('ifconfig wlan0')
+        wlan.run_ifconfig('wlan0')
         wlan.expect('HWaddr')
         wlan.expect(prompt)
 
-        wlan.sendline('ifconfig wlan0 down')
+        wlan.run_ifconfig('wlan0 down')
         wlan.expect(prompt)
 
-        wlan.sendline('ifconfig wlan0 up')
+        wlan.run_ifconfig('wlan0 up')
         wlan.expect(prompt)
 
         # wait until the wifi can see the SSID before even trying to join
@@ -121,7 +121,7 @@ class WlanAssociate(wlan_set_ssid.WlanSetSSID):
         wlan.expect(prompt)
 
         # for reference
-        wlan.sendline('ifconfig wlan0')
+        wlan.run_ifconfig('wlan0')
         wlan.expect(prompt)
 
         # make sure dhcp worked, and for reference of IP
