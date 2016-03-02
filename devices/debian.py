@@ -41,6 +41,7 @@ class DebianBox(base.BaseDevice):
                  reboot_cmd=None,
                  killall_cmd=None,
                  sysctl_cmd=None,
+                 delete_dhcp_client_leases_cmd=None
                  write_to_dhcpd=None
                  ):
         if name is None:
