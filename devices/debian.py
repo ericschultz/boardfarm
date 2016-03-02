@@ -35,6 +35,7 @@ class DebianBox(base.BaseDevice):
                  dhclient_cmd=None,
                  ip_cmd=None,
                  iptables_cmd=None,
+                 isc_dhcp_server_cmd=None,
                  tiny_proxy_cmd=None,
                  tftpd_hpa_cmd=None,
                  reboot_cmd=None,
