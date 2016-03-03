@@ -297,7 +297,7 @@ class DebianBox(base.BaseDevice):
 
     def setup_as_lan_device(self):
         # potential cleanup so this wan device works
-        self.killall_cmd('iperf ab hping3')
+        self.run_killall('iperf ab hping3')
         self.expect(self.prompt)
         self.sendline("\n")
         self.run_iptables('-t nat -X')
@@ -321,7 +321,7 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
         self.run_sysctl('net.ipv4.tcp_sack=0')
         self.expect(self.prompt)
-        self.killall_cmd('dhclient')
+        self.run_killall('dhclient')
         self.expect(self.prompt)
 
     def start_lan_client(self):
