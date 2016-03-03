@@ -158,8 +158,5 @@ class DLIPowerSwitch(PowerDevice):
         self.switch = dlipower.PowerSwitch(hostname=ip_address, userid=username, password=password)
         self.outlet = outlet
 
-    def reset(self):
-        self.switch.cycle(self.outlet)
-
-    def reset(self, outlet):
+    def reset(self, outlet=self.outlet):
         self.switch.cycle(outlet)
