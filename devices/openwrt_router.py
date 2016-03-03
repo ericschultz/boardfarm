@@ -63,7 +63,7 @@ class OpenWrtRouter(base.BaseDevice):
         self.connection = connection_decider.connection(connection_type, device=self, conn_cmd=conn_cmd, **kwargs)
         self.connection.connect()
 
-        self.power = power.get_power_device(power_ip, power_outlet, power_username, power_password)
+        self.power = power.get_power_device(power_ip, outlet=power_outlet, username=power_username, password=power_password)
         self.model = model
         self.web_proxy = web_proxy
         if tftp_server:
