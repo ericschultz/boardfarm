@@ -6,6 +6,8 @@
         "location": "austin",
 	"powerip": "10.0.2.230",
         "powerport": "1",
+        "power_username": "outlet1",
+        "power_password": "test",
         "wan_device": "rpi2",
         "notes": "Old board",
 	"connection_type": "local_serial",
