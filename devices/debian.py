@@ -228,7 +228,7 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
         self.sendline('sudo fix_dhcp_eth1')
         self.expect(self.prompt)
-        self.write_to_dhcpd('<< EOF')
+        self.run_write_to_dhcpd('<< EOF')
         self.sendline('ddns-update-style none;')
         self.sendline('option domain-name "bigfoot-test";')
         if self.location == "chennai":
