@@ -170,7 +170,7 @@ class OpenWrtRouter(base.BaseDevice):
                 self.expect(self.uprompt)
         raise Exception("TFTP failed, try rebooting the board.")
 
-    def prepare_file(self, fname, username='root', password='bigfoot1'):
+    def prepare_file(self, fname, username='tester', password='test'):
         '''Copy file to tftp server, so that it it available to tftp
         to the board itself.'''
         if fname.startswith("http://") or fname.startswith("https://"):
