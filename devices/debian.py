@@ -334,7 +334,7 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
 
     def start_lan_client(self):
-        self.ifconfig_cmd('eth1 0.0.0.0')
+        self.run_ifconfig('eth1 0.0.0.0')
         self.expect('ifconfig eth1')
         self.expect(self.prompt)
         self.run_delete_dhcp_client_leases()
