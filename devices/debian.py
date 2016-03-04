@@ -223,10 +223,10 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
 
         # configure DHCP server
-        '''
+
         self.run_isc_dhcp_server('stop');
         self.expect(self.prompt)
-        self.sendline('sed s/INTERFACES=.*/INTERFACES=\\"eth1\\"/g -i /etc/default/isc-dhcp-server')
+        self.sendline('sudo fix_dhcp_eth1')
         self.expect(self.prompt)
         self.write_to_dhcpd('<< EOF')
         self.sendline('ddns-update-style none;')
@@ -246,7 +246,7 @@ class DebianBox(base.BaseDevice):
         self.run_isc_dhcp_server("start");
         self.expect(['Starting ISC DHCP server.*dhcpd.', 'Starting isc-dhcp-server.*'])
         self.expect(self.prompt)
-'''
+
         # configure routing
         self.run_sysctl('net.ipv4.ip_forward=1')
         self.expect(self.prompt)
