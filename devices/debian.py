@@ -258,7 +258,7 @@ class DebianBox(base.BaseDevice):
         self.run_tftpd_hpa('stop')
         self.expect('Stopping')
         self.expect(self.prompt)
-        self.run("sudo tftp_setup")
+        self.sendline("sudo tftp_setup")
         self.expect(self.prompt)
         self.run_tftpd_hpa('restart')
         self.expect(self.prompt)
