@@ -442,7 +442,7 @@ class DebianBox(base.BaseDevice):
     def run_sysctl(self, command):
         self.sendline('%s %s' % (self.sysctl_cmd, command))
 
-    def run_delete_dhcp_client_leases(self, command):
+    def run_delete_dhcp_client_leases(self):
         self.sendline(self.delete_dhcp_client_leases_cmd)
 
     def run_write_to_dhcpd(self, command):
