@@ -254,6 +254,15 @@ class DebianBox(base.BaseDevice):
         self.run_iptables('-t nat -A POSTROUTING -o eth0 -j SNAT --to-source %s' % wan_ip_uplink)
         self.expect(self.prompt)
 
+
+        self.run_tftpd_hpa('stop')
+        self.expect('Stopping')
+        self.expect(self.prompt)
+        self.run("sudo tftp_setup")
+        self.expect(self.prompt)
+        self.run_tftpd_hpa('restart')
+        self.expect(self.prompt)
+
         #configure tftp server
         '''
         self.run_tftpd_hpa('stop')
