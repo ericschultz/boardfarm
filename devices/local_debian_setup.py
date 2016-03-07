@@ -1,6 +1,7 @@
 import base
 import pexpect
 import debian
+import sys
 
 class LocalDebianSetup(base.BaseDevice):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
