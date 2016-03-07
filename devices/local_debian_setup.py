@@ -3,6 +3,7 @@ import pexpect
 import debian
 import sys
 import argparse
+from termcolor import colored, cprint
 
 class LocalDebianSetup(base.BaseDevice):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
@@ -42,7 +43,6 @@ class LocalDebianSetup(base.BaseDevice):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("box_action", choices=['init_wan', 'init_lan', 'start_lan_client'])
-    parser.add_argument("name", default="local_box")
 
 
     args = parser.parse_args()
