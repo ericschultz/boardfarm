@@ -17,7 +17,7 @@ class LocalDebianSetup(base.BaseDevice):
 
         pexpect.spawn.__init__(self,
                                command="bash")
-        self.name = name
+
         self.color = color
         self.output = output
         self.location = location
@@ -29,12 +29,12 @@ class LocalDebianSetup(base.BaseDevice):
 
         self.logfile_read = output
 
-        def setup_as_wan_gateway(self):
-            debian.DebianBox.setup_as_wan_gateway(self)
-        def setup_as_lan_device(self):
-            debian.DebianBox.setup_as_lan_device(self)
-        def start_lan_client(self):
-            debian.DebianBox.start_lan_client(self)
+    def setup_as_wan_gateway(self):
+        debian.DebianBox.setup_as_wan_gateway(self)
+    def setup_as_lan_device(self):
+        debian.DebianBox.setup_as_lan_device(self)
+    def start_lan_client(self):
+        debian.DebianBox.start_lan_client(self)
 
 
 if __name__ == '__main__':
