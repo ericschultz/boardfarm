@@ -5,7 +5,7 @@ import sys
 import argparse
 from termcolor import colored, cprint
 
-class LocalDebianSetup(base.DebianBox):
+class LocalDebianSetup(debian.DebianBox):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
 
     def __init__(self,
