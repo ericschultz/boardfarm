@@ -2,6 +2,7 @@ import base
 import pexpect
 import debian
 import sys
+import argparse
 
 class LocalDebianSetup(base.BaseDevice):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
