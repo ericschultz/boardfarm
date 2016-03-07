@@ -9,14 +9,11 @@ class LocalDebianSetup(base.BaseDevice):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
 
     def __init__(self,
-                 name,
                  color,
                  output=sys.stdout,
                  reboot=False,
                  location=None
                  ):
-        if name is None:
-            return
 
         pexpect.spawn.__init__(self,
                                command="bash")
@@ -24,7 +21,7 @@ class LocalDebianSetup(base.BaseDevice):
         self.color = color
         self.output = output
         self.location = location
-        cprint("%s device console = %s" % (name, colored(color, color)), None, attrs=['bold'])
+        cprint("%s device console = %s" % ("local device", colored(color, color)), None, attrs=['bold'])
         self.expect(self.prompt)
 
         if reboot:
@@ -46,7 +43,7 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-    dev = LocalDebianSetup(args.name, 'blue')
+    dev = LocalDebianSetup('blue')
 
 
     if args.action == "init_wan":
