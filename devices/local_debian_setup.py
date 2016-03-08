@@ -36,10 +36,18 @@ class LocalDebianSetup(debian.DebianBox):
     def start_lan_client(self):
         debian.DebianBox.start_lan_client(self)
 
+    def restart_tftp_server(self):
+        debian.DebianBox.restart_tftp_server(self)
+
+    def turn_on_pppoe(self):
+        debian.DebianBox.turn_on_pppoe(self)
+    def ip_neigh_flush(self):
+        debian.DebianBox.ip_neigh_flush(self)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client'])
+    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client', 'restart_tftp_server', 'turn_on_pppoe', 'ip_neigh_flush'])
 
 
     args = parser.parse_args()
@@ -52,5 +60,7 @@ if __name__ == '__main__':
         dev.setup_as_lan_device()
     elif args.action == 'start_lan_client':
         dev.start_lan_client()
+    elif args.action == 'restart_tftp_server':
+        dev.restart_tftp_server()
     else:
         parser.print_help()

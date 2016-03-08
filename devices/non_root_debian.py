@@ -13,6 +13,7 @@ class NonRootDebianBox(base.BaseDevice):
                  reboot=False,
                  location=None
                  ):
+
          if name is None:
              return
          if username is None:
@@ -59,7 +60,7 @@ class NonRootDebianBox(base.BaseDevice):
          self.logfile_read = output
 
      def reset(self):
-         self.sendline('reboot')
+         self.sendline('sudo reboot')
          self.expect(['going down','disconnected'])
          try:
              self.expect(self.prompt, timeout=10)
@@ -88,29 +89,18 @@ class NonRootDebianBox(base.BaseDevice):
          return ipaddr
 
      def ip_neigh_flush(self):
-         self.sendline('\nip -s neigh flush all')
-         self.expect('flush all')
+         self.sendline("sudo ip_neigh_flush")
          self.expect(self.prompt)
 
      def turn_on_pppoe(self):
-         self.sendline('apt-get -o Dpkg::Options::="--force-confnew" -y install pppoe')
-         self.expect(self.prompt)
-         self.sendline('cat > /etc/ppp/pppoe-server-options << EOF')
-         self.sendline('noauth')
-         self.sendline('ms-dns 8.8.8.8')
-         self.sendline('ms-dns 8.8.4.4')
-         self.sendline('EOF')
-         self.expect(self.prompt)
-         self.sendline('pppoe-server -k -I eth1 -L 192.168.2.1 -R 192.168.2.10 -N 4')
+         self.sendline("sudo turn_on_pppoe")
          self.expect(self.prompt)
 
      def turn_off_pppoe(self):
-         self.sendline("\nkillall pppoe-server pppoe pppd")
-         self.expect("pppd")
-         self.expect(self.prompt)
+        pass
 
      def restart_tftp_server(self):
-         self.sendline('\n/etc/init.d/tftpd-hpa restart')
+         self.sendline('\nsudo restart_tftp_server')
          self.expect('Restarting')
          self.expect(self.prompt)
 
