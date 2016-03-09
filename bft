@@ -33,7 +33,7 @@ def main():
     import devices
     from termcolor import colored
     from library import print_bold
-    from devices import board_decider, debian, logstash, elasticlogger
+    from devices import board_decider, debian, non_root_debian, logstash, elasticlogger
 
     # Connect to any board in list
     connected_to_board = False
@@ -67,13 +67,13 @@ def main():
             config.wlan2g = None
 
             if config.board.get('wan_device'):
-                config.wan = debian.DebianBox(config.board.get('wan_device'),
+                config.wan = non_root_debian.NonRootDebianBox(config.board.get('wan_device'),
                                               color='cyan', reboot=config.reboot_vms,
                                               location=config.board.get('location'),
                                               username=config.board.get('wan_username', None), password=config.board.get('wan_password', None),
                                               port=config.board.get('wan_port', None))
             if config.board.get('lan_device'):
-                config.lan = debian.DebianBox(config.board.get('lan_device'), color='blue', reboot=config.reboot_vms,
+                config.lan =  non_root_debian.NonRootDebianBox(config.board.get('lan_device'), color='blue', reboot=config.reboot_vms,
                                               username=config.board.get('lan_username', None), password=config.board.get('lan_password', None),
                                               port=config.board.get('lan_port', None))
             if config.board.get('wlan_device'):
