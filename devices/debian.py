@@ -208,6 +208,8 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
         self.sendline('chmod a+w /tftpboot/crashdump')
         self.expect(self.prompt)
+        self.sendline('chmod a+w /tftpboot/tmp')
+        self.expect(self.prompt)
         self.sendline('sed /TFTP_OPTIONS/d -i /etc/default/tftpd-hpa')
         self.expect(self.prompt)
         self.sendline('echo TFTP_OPTIONS=\\"-4 --secure --create\\" >> /etc/default/tftpd-hpa')

@@ -62,5 +62,9 @@ if __name__ == '__main__':
         dev.start_lan_client()
     elif args.action == 'restart_tftp_server':
         dev.restart_tftp_server()
+    elif args.action == 'ip_neigh_flush':
+        dev.ip_neigh_flush()
+    elif args.action == 'turn_on_pppoe':
+        dev.turn_on_pppoe()
     else:
         parser.print_help()
