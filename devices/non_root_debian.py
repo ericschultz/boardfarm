@@ -1,6 +1,10 @@
+import sys
+import time
+import pexpect
 import base
+import argparse
 
-
+from termcolor import colored, cprint
 class NonRootDebianBox(base.BaseDevice):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
     def __init__(self,
@@ -97,7 +101,7 @@ class NonRootDebianBox(base.BaseDevice):
          self.expect(self.prompt)
 
      def turn_off_pppoe(self):
-        pass
+         pass
 
      def restart_tftp_server(self):
          self.sendline('\nsudo restart_tftp_server')
