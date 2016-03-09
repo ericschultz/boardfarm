@@ -246,7 +246,7 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
         self.sendline('iptables -t nat -A PREROUTING -p tcp --dport 222 -j DNAT --to-destination 192.168.1.1:22')
         self.expect(self.prompt)
-        self.sendline('iptables -t nat -A POSTROUTING -o eth1 -p tcp --dport 22 -j MASQUERADE')
+        #Sself.sendline('iptables -t nat -A POSTROUTING -o eth1 -p tcp --dport 22 -j MASQUERADE')
         self.expect(self.prompt)
         self.sendline('echo 0 > /proc/sys/net/ipv4/tcp_timestamps')
         self.expect(self.prompt)
