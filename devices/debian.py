@@ -319,75 +319,7 @@ class DebianBox(base.BaseDevice):
             pass
         self.expect(self.prompt)
 
-
-'''
-    def send_sudo(self, command):
-        self.sendline("sudo %s" % command)
-
-    def run_ifconfig(self, command):
-        self.sendline("\n%s %s" % (self.ifconfig_cmd, command))
-
-    def run_aptget(self, command):
-        self.sendline('%s %s' % (self.aptget_cmd, command))
-
-    def run_route(self, command):
-        self.sendline('%s %s' % (self.route_cmd, command))
-
-    def run_dhclient(self, command):
-        self.sendline('%s %s' % (self.dhclient_cmd, command))
-
-    def run_ip(self, command):
-        self.sendline('%s %s' % (self.ip_cmd, command))
-
-    def run_iptables(self, command):
-        self.sendline('%s %s' % (self.iptables_cmd, command))
-
-    def run_isc_dhcp_server(self, command):
-        self.sendline('%s %s' % (self.isc_dhcp_server_cmd, command))
-
-    def run_tiny_proxy(self, command):
-        self.sendline('%s %s' % (self.tiny_proxy_cmd, command))
-
-    def run_tftpd_hpa(self, command):
-        self.sendline('%s %s' % (self.tftpd_hpa_cmd, command))
-
-    def run_reboot(self):
-        self.sendline(self.reboot_cmd)
-
-    def run_killall(self, command):
-        self.sendline('%s %s' % (self.killall_cmd, command))
-
-    def run_sysctl(self, command):
-        self.sendline('%s %s' % (self.sysctl_cmd, command))
-
-    def run_delete_dhcp_client_leases(self):
-        self.sendline(self.delete_dhcp_client_leases_cmd)
-
-    def run_write_to_dhcpd(self, command):
-        self.sendline('%s %s' % (self.write_to_dhcpd, command))
-'''
-
 if __name__ == '__main__':
-<<<<<<< HEAD
-    parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client'])
-    parser.add_argument("name")
-    parser.add_argument("--user", dest="user", default=None)
-    parser.add_argument("--password", dest="password", default=None)
-
-    args = parser.parse_args()
-    dev = DebianBox(args.name, 'blue', username=args.user, password=args.password )
-
-
-    if args.action == "init_wan":
-        dev.setup_as_wan_gateway()
-    elif args.action == 'init_lan':
-        dev.setup_as_lan_device()
-    elif args.action == 'start_lan_client':
-        dev.start_lan_client()
-    else:
-        parser.print_help()
-=======
     # Example use
     dev = DebianBox('10.0.0.173',
                     'blue',
@@ -401,4 +333,3 @@ if __name__ == '__main__':
     dev.sendline('echo Hello')
     dev.expect('Hello', timeout=4)
     dev.expect(dev.prompt)
->>>>>>> wan_lan_take_two
