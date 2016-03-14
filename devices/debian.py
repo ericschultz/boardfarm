@@ -25,20 +25,14 @@ class DebianBox(base.BaseDevice):
                  name,
                  color,
                  output=sys.stdout,
-                 username=None,
-                 password=None,
-                 port=None,
+                 username,
+                 password,
+                 port,
                  reboot=False,
                  location=None
                  ):
         if name is None:
             return
-        if username is None:
-            username='root'
-        if password is None:
-            password='bigfoot1'
-        if port is None:
-            port='22'
 
         pexpect.spawn.__init__(self,
                                command="ssh",
@@ -374,6 +368,7 @@ class DebianBox(base.BaseDevice):
 '''
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     parser = argparse.ArgumentParser()
     parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client'])
     parser.add_argument("name")
@@ -392,3 +387,18 @@ if __name__ == '__main__':
         dev.start_lan_client()
     else:
         parser.print_help()
+=======
+    # Example use
+    dev = DebianBox('10.0.0.173',
+                    'blue',
+                    username="root",
+                    password="bigfoot1",
+                    port="22")
+    dev.sendline('echo Hello')
+    dev.expect('Hello', timeout=4)
+    dev.expect(dev.prompt)
+    dev.reset()
+    dev.sendline('echo Hello')
+    dev.expect('Hello', timeout=4)
+    dev.expect(dev.prompt)
+>>>>>>> wan_lan_take_two
