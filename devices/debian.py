@@ -24,10 +24,10 @@ class DebianBox(base.BaseDevice):
     def __init__(self,
                  name,
                  color,
-                 output=sys.stdout,
                  username,
                  password,
                  port,
+                 output=sys.stdout,
                  reboot=False,
                  location=None
                  ):
