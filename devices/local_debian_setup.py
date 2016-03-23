@@ -4,7 +4,6 @@ import debian
 import sys
 import argparse
 from termcolor import colored, cprint
-import tempfile
 
 class LocalDebianSetup(debian.DebianBox):
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
@@ -24,10 +23,8 @@ class LocalDebianSetup(debian.DebianBox):
         self.location = location
         cprint("%s device console = %s" % ("local device", colored(color, color)), None, attrs=['bold'])
         self.expect(self.prompt)
-        my_file = tempfile.NamedTemporaryFile(dir="/tmp/", delete=False)
-        file_name = my_file.name
-        my_file.close()
-        self.sendline("exec 2> %s" % file_name)
+
+        self.sendline("exec 2> /tmp/local_run.log")
         self.sendline("exec 1>&2")
         self.sendline("set -x")
         self.expect(self.prompt)
