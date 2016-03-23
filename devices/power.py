@@ -31,9 +31,9 @@ def get_power_device(ip_address, username=None, password=None, outlet=None):
         raise Exception("\nError connecting to %s" % ip_address)
     if t == 0:
         return DLIPowerSwitch(ip_address, outlet=outlet, username=username, password=password)
-    if t == 1:
+    elif t == 1:
         return SentrySwitchedCDU(ip_address, outlet=outlet)
-    if t == 2:
+    elif t == 2:
         return APCPower(ip_address, outlet=outlet)
     else:
         raise Exception("No code written to handle power device found at %s" % ip_address)
