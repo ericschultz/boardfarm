@@ -53,7 +53,6 @@ class NonRootDebianBox(base.BaseDevice):
         self.password = password
         self.port = port
         self.location = location
-        self.sendline("set -x")
         cprint("%s device console = %s" % (name, colored(color, color)), None, attrs=['bold'])
         try:
             i = self.expect(["yes/no", "assword:", "Last login"], timeout=30)
