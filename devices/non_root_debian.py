@@ -10,7 +10,7 @@ import time
 import pexpect
 import base
 import argparse
-
+import tempfile
 from termcolor import colored, cprint
 
 
