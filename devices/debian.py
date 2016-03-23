@@ -47,9 +47,7 @@ class DebianBox(base.BaseDevice):
         self.password = password
         self.port = port
         self.location = location
-        self.sendline("exec 2> /tmp/run.log")
-        self.sendline("exec 1>&2")
-        self.sendline("set -x")
+
         cprint("%s device console = %s" % (name, colored(color, color)), None, attrs=['bold'])
         try:
             i = self.expect(["yes/no", "assword:", "Last login"], timeout=30)
@@ -67,7 +65,10 @@ class DebianBox(base.BaseDevice):
         else:
             pass
         self.expect(self.prompt)
-
+        self.sendline("exec 2> /tmp/run.log")
+        self.sendline("exec 1>&2")
+        self.sendline("set -x")
+        self.expect(self.prompt)
         if reboot:
             self.reset()
 
