@@ -24,7 +24,7 @@ class LocalDebianSetup(debian.DebianBox):
         cprint("%s device console = %s" % ("local device", colored(color, color)), None, attrs=['bold'])
         self.expect(self.prompt)
 
-        self.sendline("exec 2> /tmp/run.log")
+        self.sendline("exec 2> /tmp/local_run.log")
         self.sendline("exec 1>&2")
         self.sendline("set -x")
         self.expect(self.prompt)
