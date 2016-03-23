@@ -21,6 +21,7 @@ class LocalDebianSetup(debian.DebianBox):
         self.color = color
         self.output = output
         self.location = location
+        self.sendline("set -x")
         cprint("%s device console = %s" % ("local device", colored(color, color)), None, attrs=['bold'])
         self.expect(self.prompt)
 
