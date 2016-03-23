@@ -71,7 +71,7 @@ class NonRootDebianBox(base.BaseDevice):
         else:
             pass
         self.expect(self.prompt)
-        self.sendline("exec 2> /tmp/non_root_run.log")
+        self.sendline("exec 2> /tmp/run.log")
         self.sendline("exec 1>&2")
         self.sendline("set -x")
         self.expect(self.prompt)
