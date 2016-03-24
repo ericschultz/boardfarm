@@ -269,12 +269,12 @@ class DebianBox(base.BaseDevice):
             raise Exception("Error: Device on LAN couldn't obtain address via DHCP.")
         self.sendline('ifconfig eth1')
         self.expect(self.prompt)
-        self.sendline('route del default')
+        self.sendline('route del default eth1')
+        self.expect(self.prompt)
+    '''    self.sendline('route del default')
         self.expect(self.prompt)
         self.sendline('route del default')
-        self.expect(self.prompt)
-        self.sendline('route del default')
-        self.expect(self.prompt)
+        self.expect(self.prompt)'''
         self.sendline('route add default gw 192.168.1.1')
         self.expect(self.prompt)
         # Setup HTTP proxy, so board webserver is accessible via this device
