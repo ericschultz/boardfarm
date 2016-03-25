@@ -255,12 +255,12 @@ class DebianBox(base.BaseDevice):
         self.sendline('\nifconfig eth1 0.0.0.0')
         self.expect('ifconfig eth1')
         self.expect(self.prompt)
-        self.sendline('dhcpcd -k eth1')
+        self.sendline('rm /var/lib/dhcp/dhclient.leases')
         self.expect(self.prompt)
         for attempt in range(3):
             try:
-                self.sendline('dhcpcd eth1')
-                #self.expect('DHCPOFFER', timeout=30)
+                self.sendline('dhclient -v eth1')
+                self.expect('DHCPOFFER', timeout=30)
                 self.expect(self.prompt)
                 break
             except:
@@ -275,7 +275,7 @@ class DebianBox(base.BaseDevice):
         #self.expect(self.prompt)
         #self.sendline('route del default')
         #self.expect(self.prompt)
-        self.sendline('route add default gw 192.168.1.1 metric 203')
+        #self.sendline('route add default gw 192.168.1.1')
         self.expect(self.prompt)
         # Setup HTTP proxy, so board webserver is accessible via this device
         self.sendline('apt-get -qy install tinyproxy curl apache2-utils nmap')
