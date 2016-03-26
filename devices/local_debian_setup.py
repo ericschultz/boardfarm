@@ -44,10 +44,13 @@ class LocalDebianSetup(debian.DebianBox):
     def ip_neigh_flush(self):
         debian.DebianBox.ip_neigh_flush(self)
 
+    def stop_lan_client(self):
+        debian.DebianBox.stop_lan_client(self)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client', 'restart_tftp_server', 'turn_on_pppoe', 'ip_neigh_flush'])
+    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client', 'restart_tftp_server', 'turn_on_pppoe', 'ip_neigh_flush', 'stop_lan_client'])
 
 
     args = parser.parse_args()
@@ -66,5 +69,7 @@ if __name__ == '__main__':
         dev.ip_neigh_flush()
     elif args.action == 'turn_on_pppoe':
         dev.turn_on_pppoe()
+    elif args.arction == 'stop_lan_client':
+        dev.stop_lan_client()
     else:
         parser.print_help()
