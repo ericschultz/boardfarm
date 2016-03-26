@@ -69,7 +69,7 @@ if __name__ == '__main__':
         dev.ip_neigh_flush()
     elif args.action == 'turn_on_pppoe':
         dev.turn_on_pppoe()
-    elif args.arction == 'stop_lan_client':
+    elif args.action == 'stop_lan_client':
         dev.stop_lan_client()
     else:
         parser.print_help()
