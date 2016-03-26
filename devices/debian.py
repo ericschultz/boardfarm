@@ -348,7 +348,6 @@ class DebianBox(base.BaseDevice):
                 self.sendcontrol('c')
         else:
             raise Exception("Error: Device on LAN couldn't obtain address via DHCP.")
-        self.expect('ifconfig eth0')
         self.expect(self.prompt)
 
 
