@@ -320,36 +320,36 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
 
 
-        def stop_lan_client(self):
-            '''
-            when you're done running a lan client, you may want to get access to
-            your regular gateway again. We do that here
-            '''
-            self.sendline('\nifconfig eth1 0.0.0.0')
-            self.expect('ifconfig eth1')
-            self.expect(self.prompt)
-            self.sendline('ifconfig eth0')
-            self.expect(self.prompt)
-            self.sendline('route del default')
-            self.expect(self.prompt)
-            self.sendline('route del default')
-            self.expect(self.prompt)
-            self.sendline('route del default')
-            self.expect(self.prompt)
-            self.sendline('rm /var/lib/dhcp/dhclient.leases')
-            self.expect(self.prompt)
-            for attempt in range(3):
-                try:
-                    self.sendline('dhclient -v eth0')
-                    self.expect('DHCPOFFER', timeout=30)
-                    self.expect(self.prompt)
-                    break
-                except:
-                    self.sendcontrol('c')
-            else:
-                raise Exception("Error: Device on LAN couldn't obtain address via DHCP.")
-            self.expect('ifconfig eth0')
-            self.expect(self.prompt)
+    def stop_lan_client(self):
+        '''
+        when you're done running a lan client, you may want to get access through
+        your regular gateway again. We do that here
+        '''
+        self.sendline('\nifconfig eth1 0.0.0.0')
+        self.expect('ifconfig eth1')
+        self.expect(self.prompt)
+        self.sendline('ifconfig eth0')
+        self.expect(self.prompt)
+        self.sendline('route del default')
+        self.expect(self.prompt)
+        self.sendline('route del default')
+        self.expect(self.prompt)
+        self.sendline('route del default')
+        self.expect(self.prompt)
+        self.sendline('rm /var/lib/dhcp/dhclient.leases')
+        self.expect(self.prompt)
+        for attempt in range(3):
+            try:
+                self.sendline('dhclient -v eth0')
+                self.expect('DHCPOFFER', timeout=30)
+                self.expect(self.prompt)
+                break
+            except:
+                self.sendcontrol('c')
+        else:
+            raise Exception("Error: Device on LAN couldn't obtain address via DHCP.")
+        self.expect('ifconfig eth0')
+        self.expect(self.prompt)
 
 
 if __name__ == '__main__':
