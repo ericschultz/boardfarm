@@ -22,9 +22,6 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         if self.model in ("ap152", "ap152-8M"):
             self.lan_iface = "eth0.1"
             self.wan_iface = "eth0.2"
-        if self.model in ('db120'):
-            self.lan_iface = 'eth0.2'
-            self.wan_iface = 'br-lan'
 
     def check_memory_addresses(self):
         '''Before flashing an image, set memory addresses.'''
