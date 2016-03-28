@@ -19,7 +19,7 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
 
     def __init__(self, *args, **kwargs):
         super(QcomMipsRouter, self).__init__(*args, **kwargs)
-        if self.model in ("ap152", "ap152-8M"):
+        if self.model in ("ap152", "ap152-8M", "db120"):
             self.lan_iface = "eth0.1"
             self.wan_iface = "eth0.2"
 
