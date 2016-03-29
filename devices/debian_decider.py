@@ -10,5 +10,5 @@ def debian(name, color,
                     location=None):
     if (username is 'root'):
         return debian.DebianBox(name, color, username, password, port, output, reboot, location)
-    else
+    else:
         return non_root_debian.NonRootDebianBox(name, color, username, password, port, output, reboot, location)
