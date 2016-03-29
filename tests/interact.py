@@ -12,10 +12,27 @@ import sys
 import glob
 from devices import board, wan, lan, wlan, prompt
 
-def print_subclasses(cls):
+def get_subclasses_as_arrays(cls):
+    yield cls.__name__
     for x in cls.__subclasses__():
-        print(x.__name__)
-        print_subclasses(x)
+        yield get_subclasses_as_arrays(x)
+
+def flatten(l):
+    for el in l:
+        if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
+            for sub in flatten(el):
+                yield sub
+        else:
+            yield el
+
+def flatten_subclasses(cls):
+    arrays = [].get_subclasses_as_arrays(cls)
+    return flatten(arrays)
+
+
+def print_subclasses(cls):
+    for x in sorted(flatten_subclasses(cls)):
+        print(x)
 
 class Interact(rootfs_boot.RootFSBootTest):
     '''Interact with console, wan, lan, wlan connections and re-run tests'''
