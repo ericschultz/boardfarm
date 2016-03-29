@@ -1,5 +1,6 @@
 import debian
 import non_root_debian
+import sys
 
 def debian(name, color,
                     username,
