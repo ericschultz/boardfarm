@@ -26,7 +26,7 @@ def flatten(l):
             yield el
 
 def flatten_subclasses(cls):
-    arrays = [].extend(get_subclasses_as_arrays(cls))
+    arrays = [].get_subclasses_as_arrays(cls)
     return flatten(arrays)
 
 
