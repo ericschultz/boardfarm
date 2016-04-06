@@ -9,7 +9,6 @@ import sys
 import time
 import pexpect
 import base
-import argparse
 
 from termcolor import colored, cprint
 
