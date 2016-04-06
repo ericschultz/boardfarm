@@ -28,8 +28,7 @@ class DebianBox(base.BaseDevice):
                  port,
                  output=sys.stdout,
                  reboot=False,
-                 location=None
-                 ):
+                 location=None):
         if name is None:
             return
 
