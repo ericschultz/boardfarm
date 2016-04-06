@@ -198,6 +198,8 @@ class DebianBox(base.BaseDevice):
         self.expect(self.prompt)
         self.sendline('mkdir -p /tftpboot/tmp')
         self.expect(self.prompt)
+        self.sendline('chmod a+w /tftpboot/tmp')
+        self.expect(self.prompt)
         self.sendline('mkdir -p /tftpboot/crashdump')
         self.expect(self.prompt)
         self.sendline('chmod a+w /tftpboot/crashdump')
