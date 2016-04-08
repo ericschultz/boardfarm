@@ -16,7 +16,7 @@ from termcolor import colored, cprint
 
 class NonRootDebianBox(base.BaseDevice):
     '''
-    A linux machine running an ssh server.
+    A linux machine running an ssh server, not running as root.
     '''
 
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
@@ -24,22 +24,15 @@ class NonRootDebianBox(base.BaseDevice):
     def __init__(self,
                  name,
                  color,
+                 username,
+                 password,
+                 port,
                  output=sys.stdout,
-                 username=None,
-                 password=None,
-                 port=None,
                  reboot=False,
                  location=None
                  ):
         if name is None:
             return
-        if username is None:
-            username='root'
-        if password is None:
-            password='bigfoot1'
-        if port is None:
-            port='22'
-
         pexpect.spawn.__init__(self,
                                command="ssh",
                                args=['%s@%s' % (username, name),
