@@ -71,7 +71,7 @@ class Set_IPv6_Addresses(rootfs_boot.RootFSBootTest):
         board.sendline('\nifconfig | grep -B2 addr:')
         board.expect('ifconfig ')
         board.expect(prompt)
-        lan.sendline('\nifconfig  | grep -B2 addr:')
+        lan.sendline('\nifconfig | grep -B2 addr:')
         lan.expect('ifconfig ')
         lan.expect(prompt)
         wan.sendline('\nifconfig | grep -B2 addr:')
