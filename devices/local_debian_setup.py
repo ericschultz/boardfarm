@@ -50,12 +50,11 @@ class LocalDebianSetup(debian.DebianBox):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client', 'restart_tftp_server', 'turn_on_pppoe', 'ip_neigh_flush', 'stop_lan_client'])
-
+    parser.add_argument("action", choices=['init_wan', 'init_lan', 'start_lan_client',
+                'restart_tftp_server', 'turn_on_pppoe', 'ip_neigh_flush', 'stop_lan_client'])
 
     args = parser.parse_args()
     dev = LocalDebianSetup('blue')
-
 
     if args.action == "init_wan":
         dev.setup_as_wan_gateway()
