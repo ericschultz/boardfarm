@@ -54,7 +54,7 @@ if __name__ == '__main__':
                 'restart_tftp_server', 'turn_on_pppoe', 'ip_neigh_flush', 'stop_lan_client'])
 
     args = parser.parse_args()
-    dev = LocalDebianSetup('blue')
+    dev = LocalDebianSetup('cyan')
 
     if args.action == "init_wan":
         dev.setup_as_wan_gateway()
