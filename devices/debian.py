@@ -31,7 +31,6 @@ class DebianBox(base.BaseDevice):
                  location=None):
         if name is None:
             return
-
         pexpect.spawn.__init__(self,
                                command="ssh",
                                args=['%s@%s' % (username, name),
