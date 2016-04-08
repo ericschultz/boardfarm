@@ -137,7 +137,3 @@ class NonRootDebianBox(base.BaseDevice):
     def start_lan_client(self):
         self.sendline('\nsudo start_lan_client')
         self.expect(self.prompt)
-
-    def stop_lan_client(self):
-        self.sendline('\nsudo stop_lan_client')
-        self.expect(self.prompt)
