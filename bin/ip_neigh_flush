@@ -1,0 +1,8 @@
+#!/bin/sh
+set -x
+
+. get_dir.sh
+
+python $DIR/local_debian_setup.py ip_neigh_flush 1>&2 | tee /tmp/ip_neigh_flush.log
+
+exit 0

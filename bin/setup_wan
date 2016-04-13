@@ -1,0 +1,7 @@
+#!/bin/sh
+set -x
+
+. get_dir.sh
+
+python $DIR/local_debian_setup.py init_wan 2>&1 | tee /tmp/setup_wan.log
+exit 0
