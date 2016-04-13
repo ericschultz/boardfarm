@@ -120,7 +120,7 @@ if __name__ == '__main__':
         parser.print_help();
         sys.exit(1)
 
-    runner = SetupRunner(username=args.user, type=args.type, test=run_test)
+    runner = SetupRunner(username=args.user, type=args.type, test=args.run_test)
     runner.add_to_sudoers()
 
     runner.add_links_for_bins()
