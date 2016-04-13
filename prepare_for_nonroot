@@ -1,0 +1,128 @@
+
+import argparse
+import re
+import sys
+import pexpect
+import os
+import tempfile
+
+from devices import base
+
+
+class FakeDevice(base.BaseDevice):
+    prompt = ['.+\\@.*:.*(\$|#)']
+    def __init__(self):
+        pexpect.spawn.__init__(self, command="bash")
+        self.logfile_read = sys.stdout
+
+
+    #we default to bin subdir
+class SetupRunner(object):
+    test = True
+
+    def __init__(self,username, type):
+        self.device = FakeDevice()
+        self.type = type
+        self.username = username
+
+    def add_to_sudoers(self, template_file=None):
+        if template_file is None:
+            template_file = self.local_dir('conf', 'testing_sudoers')
+        f = open(template_file, 'rb')
+        lines = f.readlines()
+        f.close()
+
+        testing_cmds_to_tester_regexp = "^__username__"
+        testing_cmds_to_tester_contents = "%s ALL=(ALL) NOPASSWD: TESTING_CMDS" % self.username
+        self.replace_or_add_line(lines, testing_cmds_to_tester_regexp, testing_cmds_to_tester_contents)
+        self.save_sudoers(lines)
+
+    #inspired from Ansible but not enough to influence copyright
+    def replace_or_add_line(self, lines, regex, line_to_make_present):
+        line_num = -1
+        mre = re.compile(regex)
+        for lineno, cur_line in enumerate(lines):
+            match_found = mre.search(cur_line)
+            if match_found:
+                line_num = lineno
+        if line_num != -1:
+            lines[line_num] = line_to_make_present
+        else:
+            if len(lines)>0 and not (lines[-1].endswith('\n') or lines[-1].endswith('\r')):
+                lines.append(os.linesep)
+            lines.append(line_to_make_present + os.linesep)
+
+    def save_sudoers(self, lines):
+        fd, path = tempfile.mkstemp()
+        f = os.fdopen(fd, 'w+b')
+        f.writelines(lines)
+        f.close();
+        self.device.sendline("visudo -c -f " + path)
+        self.device.expect(path + ': parsed OK')
+        if not(self.test):
+            #atomic rename
+            os.rename(path, "/etc/sudoers.d/testing_sudoers")
+
+    def add_links_for_bins(self):
+        bin_str = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
+        bins = [ f for f in os.listdir(bin_str) if not(f.endswith('.sh')) ]
+        for f in bins:
+            bin_file = os.path.join(bin_str, f)
+            command = "ln -f %s /usr/bin/%s" % (bin_file, f)
+            self.device.sendline('echo "%s"' % command)
+            self.device.expect(FakeDevice.prompt)
+            if not(self.test):
+                self.device.sendline(command)
+                self.device.expect(FakeDevice.prompt)
+
+    def set_chmods(self):
+        for f in ["/bin/ip", "/bin/ping", "/bin/ping6", "/sbin/xtables-multi", "/sbin/ifconfig"]:
+            command = "chmod 4755 %s" % f
+            self.device.sendline('echo "%s"'% command)
+            self.device.expect(FakeDevice.prompt)
+            if not(self.test):
+                self.device.sendline(command)
+                self.device.expect(FakeDevice.prompt)
+
+    def local_dir(self, *path_parts):
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)),*path_parts)
+
+    def add_to_startup(self):
+        service_file = None
+        filename = None
+        if self.type == 'lan':
+            filename = 'lan_setup.service'
+        elif self.type == 'wan':
+            filename = 'wan_setup.service'
+
+        service_file = self.local_dir('conf', filename)
+
+        command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
+        self.device.sendline('echo "%s"' % command)
+        self.device.expect(FakeDevice.prompt)
+        if not(self.test):
+            self.device.sendline(command)
+            self.device.expect(FakeDevice.prompt)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Prepare to run this device as non-root',
+                                     usage='prepare_for_non_root [options...]',
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("type", type=str, default=None, help="Set this device up as LAN device")
+    parser.add_argument('-b', '--bin_dir', metavar='', type=str, default='/usr/bin', help='Directory where the links to your binaries. Defaults to "/usr/local/bin"')
+    parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who has sudo access scripts. Default is "tester"')
+    parser.add_argument('-t', '--run_test', metavar='', type=str, help="Run a command as a test (development only)");
+
+    args = parser.parse_args()
+
+    if args.type != "lan" and args.type != "wan":
+        print("You must choose LAN or WAN")
+        parser.print_help();
+        sys.exit(1)
+
+    runner = SetupRunner(username=args.user, type=args.type)
+    runner.add_to_sudoers()
+
+    runner.add_links_for_bins()
+    runner.set_chmods()
+    runner.add_to_startup()

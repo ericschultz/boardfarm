@@ -17,6 +17,11 @@ from termcolor import colored, cprint
 class NonRootDebianBox(base.BaseDevice):
     '''
     A linux machine running an ssh server, not running as root.
+
+    This class is different from DebianBox in some unique ways. First, most of
+    the function calls here call shell scripts via sudo. Those shell
+    scripts, not included, call into local_debian_setup.py on the actual box itself.
+    This requires a copy of Boardfarm on your debian box.
     '''
 
     prompt = ['root\\@.*:.*#', '/ # ', ".*:~ #", ".*:~.*\\$", ".*\\@.*:.*\\$" ]
