@@ -18,12 +18,12 @@ class FakeDevice(base.BaseDevice):
 
     #we default to bin subdir
 class SetupRunner(object):
-    test = True
 
-    def __init__(self,username, type):
+    def __init__(self,username, type, test=True):
         self.device = FakeDevice()
         self.type = type
         self.username = username
+        self.test = test
 
     def add_to_sudoers(self, template_file=None):
         if template_file is None:
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     parser.add_argument("type", type=str, default=None, help="Set this device up as LAN device")
     parser.add_argument('-b', '--bin_dir', metavar='', type=str, default='/usr/bin', help='Directory where the links to your binaries. Defaults to "/usr/local/bin"')
     parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who has sudo access scripts. Default is "tester"')
-    parser.add_argument('-t', '--run_test', metavar='', type=str, help="Run a command as a test (development only)");
+    parser.add_argument('-t', '--run_test', action='store_true', help="Run a command as a test (development only)");
 
     args = parser.parse_args()
 
@@ -120,7 +120,7 @@ if __name__ == '__main__':
         parser.print_help();
         sys.exit(1)
 
-    runner = SetupRunner(username=args.user, type=args.type)
+    runner = SetupRunner(username=args.user, type=args.type, test=run_test)
     runner.add_to_sudoers()
 
     runner.add_links_for_bins()
