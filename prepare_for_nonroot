@@ -103,7 +103,7 @@ class SetupRunner(object):
         if not(self.test):
             self.device.sendline(command)
             self.device.expect(FakeDevice.prompt)
-            self.device.sendline('sysctl enable %s' % filename)
+            self.device.sendline('systemctl enable %s' % filename)
             self.device.expect(FakeDevice.prompt)
 
 
