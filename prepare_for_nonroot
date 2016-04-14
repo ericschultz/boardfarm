@@ -68,7 +68,7 @@ class SetupRunner(object):
         bins = [ f for f in os.listdir(bin_str) if not(f.endswith('.sh')) ]
         for f in bins:
             bin_file = os.path.join(bin_str, f)
-            command = "ln -f %s /usr/bin/%s" % (bin_file, f)
+            command = "ln -fs %s /usr/bin/%s" % (bin_file, f)
             self.device.sendline('echo "%s"' % command)
             self.device.expect(FakeDevice.prompt)
             if not(self.test):
@@ -97,7 +97,7 @@ class SetupRunner(object):
 
         service_file = self.local_dir('conf', filename)
 
-        command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
+        command = "ln -fs %s /etc/systemd/system/%s" % (service_file, filename)
         self.device.sendline('echo "%s"' % command)
         self.device.expect(FakeDevice.prompt)
         if not(self.test):
