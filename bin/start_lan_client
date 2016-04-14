@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 
 SOURCE="${BASH_SOURCE[0]}"
