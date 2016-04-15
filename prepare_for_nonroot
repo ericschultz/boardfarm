@@ -106,6 +106,9 @@ class SetupRunner(object):
             self.device.sendline('systemctl enable %s' % filename)
             self.device.expect(FakeDevice.prompt)
 
+    def clear_up_dhclient_on_eth0(self):
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Prepare to run this device as non-root',
