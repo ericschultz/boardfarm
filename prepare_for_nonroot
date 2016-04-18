@@ -113,7 +113,7 @@ class SetupRunner(object):
             self.device.expect(FakeDevice.prompt)
             self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
             self.device.expect(FakeDevice.prompt)
-            self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % (self.local_dir("conf", 'boardfarm_cron'), 'boardfarm_cron')
+            self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % (self.local_dir("conf", 'boardfarm_cron'), 'boardfarm_cron'))
             self.device.expect(FakeDevice.prompt)
 
 
