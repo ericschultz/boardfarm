@@ -1,1 +1,1 @@
-*/10 * * * * systemctl start dhclient.eth0
+*/10 * * * * root systemctl start dhclient.eth0
