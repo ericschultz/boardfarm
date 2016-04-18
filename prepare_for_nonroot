@@ -9,6 +9,23 @@ import shutil
 
 from devices import base
 
+HELP_EPILOG = '''
+Example use:
+
+ bft -b ap148 --testsuite flash_only -m http://10.0.0.101/nand-ipq806x-single.img
+
+ bft -b ap135 --testsuite preflight -r http://10.0.0.101/openwrt-ar71xx-generic-ap135-rootfs-squashfs.bin
+'''
+
+GET_STARTED = '''
+This program prepares a system to run as a LAN or WAN system
+with the tests run as a non-root user. This script is idempotent, i.e. if your
+run it multiple times, it won't cause any problems.
+
+Unless you've set the '-y' argument, we'll ask you whether you want particular
+changes made to your system. In most cases, you should answer 'y'.
+'''
+
 
 class FakeDevice(base.BaseDevice):
     prompt = ['.+\\@.*:.*(\$|#)']
@@ -116,6 +133,13 @@ class SetupRunner(object):
             self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_dir("conf", 'boardfarm_cron'))
             self.device.expect(FakeDevice.prompt)
 
+    def check_if_root(self):
+        self.device.sendline("id -u")
+        try:
+            self.device.expect('0')
+        except:
+            print("This program must be running as root. Try running with 'sudo'")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Prepare to run this device as non-root',
@@ -124,6 +148,7 @@ if __name__ == '__main__':
     parser.add_argument("type", type=str, default=None, help="Set this device up as LAN device")
     parser.add_argument('-b', '--bin_dir', metavar='', type=str, default='/usr/bin', help='Directory where the links to your binaries. Defaults to "/usr/local/bin"')
     parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who has sudo access scripts. Default is "tester"')
+    parser.add_argument('-y', '--no_prompts', action='store_true', help='Answer yes to all prompts. Used for automated systems')
     parser.add_argument('-t', '--run_test', action='store_true', help="Run a command as a test (development only)");
 
     args = parser.parse_args()
@@ -134,6 +159,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     runner = SetupRunner(username=args.user, type=args.type, test=args.run_test)
+    runner.check_if_root()
     runner.add_to_sudoers()
 
     runner.add_links_for_bins()
