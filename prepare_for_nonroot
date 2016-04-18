@@ -136,9 +136,10 @@ class SetupRunner(object):
     def check_if_root(self):
         self.device.sendline("id -u")
         try:
-            self.device.expect('0')
+            self.device.expect('$0')
         except:
             print("This program must be running as root. Try running with 'sudo'")
+            sys.exit(1)
 
 
 if __name__ == '__main__':
