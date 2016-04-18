@@ -109,11 +109,11 @@ class SetupRunner(object):
 
     def setup_cron_for_dhclient_eth0(self):
         if not(self.test):
-            self.device.sendline("ln -f %s /etc/systemd/system/%s" % self.local_dir("conf", 'dhclient.eth0.service'))
+            self.device.sendline("ln -f %s /etc/systemd/system/%s" % (self.local_dir("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'))
             self.device.expect(FakeDevice.prompt)
             self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
             self.device.expect(FakeDevice.prompt)
-            self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_dir("conf", 'boardfarm_cron'))
+            self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % (self.local_dir("conf", 'boardfarm_cron'), 'boardfarm_cron')
             self.device.expect(FakeDevice.prompt)
 
 
