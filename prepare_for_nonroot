@@ -5,6 +5,7 @@ import sys
 import pexpect
 import os
 import tempfile
+import shutil
 
 from devices import base
 
@@ -106,7 +107,9 @@ class SetupRunner(object):
             self.device.sendline('systemctl enable %s' % filename)
             self.device.expect(FakeDevice.prompt)
 
-    def clear_up_dhclient_on_eth0(self):
+    def setup_cron_on_eth0(self):
+        if not(self.test):
+            shutil.copy(self.local_dir("conf", 'boardfarm_cron'), "/etc/cron.d/boardfarm")
 
 
 
@@ -132,3 +135,4 @@ if __name__ == '__main__':
     runner.add_links_for_bins()
     runner.set_chmods()
     runner.add_to_startup()
+    runner.setup_cron_on_eth0()
