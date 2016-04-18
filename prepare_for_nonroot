@@ -139,4 +139,4 @@ if __name__ == '__main__':
     runner.add_links_for_bins()
     runner.set_chmods()
     runner.add_to_startup()
-    runner.setup_cron_on_eth0()
+    runner.setup_cron_for_dhclient_eth0()
