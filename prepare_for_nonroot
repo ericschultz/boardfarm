@@ -98,7 +98,7 @@ class SetupRunner(object):
 
         service_file = self.local_dir('conf', filename)
 
-        command = "ln -fs %s /etc/systemd/system/%s" % (service_file, filename)
+        command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
         self.device.sendline('echo "%s"' % command)
         self.device.expect(FakeDevice.prompt)
         if not(self.test):
@@ -107,10 +107,14 @@ class SetupRunner(object):
             self.device.sendline('systemctl enable %s' % filename)
             self.device.expect(FakeDevice.prompt)
 
-    def setup_cron_on_eth0(self):
+    def setup_cron_for_dhclient_eth0(self):
         if not(self.test):
-            shutil.copy(self.local_dir("conf", 'boardfarm_cron'), "/etc/cron.d/boardfarm")
-
+            self.device.sendline("ln -f %s /etc/systemd/system/%s" % self.local_dir("conf", 'dhclient.eth0.service'))
+            self.device.expect(FakeDevice.prompt)
+            self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
+            self.device.expect(FakeDevice.prompt)
+            self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_dir("conf", 'boardfarm_cron'))
+            self.device.expect(FakeDevice.prompt)
 
 
 if __name__ == '__main__':
