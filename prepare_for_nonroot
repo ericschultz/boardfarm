@@ -9,6 +9,8 @@ import shutil
 
 from devices import base
 
+from termcolor import colored, cprint
+
 GET_STARTED = '''
 This program prepares a system to run as a LAN or WAN system
 with the tests run as a non-root user. This script is idempotent, i.e. if your
@@ -51,7 +53,7 @@ class SetupDevice(base.BaseDevice):
         pexpect.spawn.__init__(self, command="bash")
         self.logfile_read = sys.stdout
         self.color = "blue"
-
+        cprint("device console = %s" % colored(color, color), None, attrs=['bold'])
 
     #we default to bin subdir
 class SetupRunner(object):
