@@ -146,26 +146,26 @@ class SetupRunner(object):
 
             service_file = self.local_file('conf', filename)
 
-            command = "cp -f %s /etc/systemd/system/%s" % (service_file, filename)
-            enable = 'systemctl enable %s' % filename
+            lines = ["cp -f %s /etc/systemd/system/%s" % (service_file, filename),
+                    "systemctl daemon-reload",
+                    'systemctl enable %s' % filename ]
             if self.test:
-                print("\n" + command)
-                print("\n" + enable)
+                for f in lines:
+                    print("\n" + f)
             else:
-                self.device.sendline(command)
-                self.device.expect(SetupDevice.prompt)
-                self.device.sendline('systemctl enable %s' % filename)
-                self.device.expect(SetupDevice.prompt)
+                for f in lines:
+                    self.device.sendline(f)
+                    self.device.expect(SetupDevice.prompt)
 
     def setup_cron_for_dhclient_eth0(self):
         if self.notify_and_ask_for_permission(ADD_CRON_DHCLIENT):
             lines = ["cp -f %s /etc/systemd/system/%s" % (self.local_file("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'),
+                        'systemctl daemon-reload',
                         'systemctl enable %s' % 'dhclient.eth0.service',
                         "ln -fs %s /etc/cron.d/boardfarm" % self.local_file("conf", 'boardfarm_cron')]
             if self.test:
                 for f in lines:
                     print("\n" + f)
-
             else:
                 for f in lines:
                     self.device.sendline(f)
