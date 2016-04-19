@@ -109,20 +109,20 @@ class SetupRunner(object):
                 bin_file = os.path.join(bin_str, f)
                 command = "ln -fs %s /usr/bin/%s" % (bin_file, f)
                 self.device.sendline('echo "%s"' % command)
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
                 if not(self.test):
                     self.device.sendline(command)
-                    self.device.expect(FakeDevice.prompt)
+                    self.device.expect(SetupDevice.prompt)
 
     def set_chmods(self):
         if self.notify_and_ask_for_permission(SET_CHMODS):
             for f in ["/bin/ip", "/bin/ping", "/bin/ping6", "/sbin/xtables-multi", "/sbin/ifconfig"]:
                 command = "chmod 4755 %s" % f
                 self.device.sendline('echo "%s"'% command)
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
                 if not(self.test):
                     self.device.sendline(command)
-                    self.device.expect(FakeDevice.prompt)
+                    self.device.expect(SetupDevice.prompt)
 
     def local_file(self, *path_parts):
         '''Calculates the absolute path from path_parts relative to the boardfarm
@@ -142,22 +142,22 @@ class SetupRunner(object):
 
             command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
             self.device.sendline('echo "%s"' % command)
-            self.device.expect(FakeDevice.prompt)
+            self.device.expect(SetupDevice.prompt)
             if not(self.test):
                 self.device.sendline(command)
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
                 self.device.sendline('systemctl enable %s' % filename)
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
 
     def setup_cron_for_dhclient_eth0(self):
         if self.notify_and_ask_for_permission(ADD_CRON_DHCLIENT):
             if not(self.test):
                 self.device.sendline("ln -f %s /etc/systemd/system/%s" % (self.local_file("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'))
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
                 self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
                 self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_file("conf", 'boardfarm_cron'))
-                self.device.expect(FakeDevice.prompt)
+                self.device.expect(SetupDevice.prompt)
 
     def check_if_root(self):
         self.device.sendline("id -u")
@@ -177,7 +177,7 @@ class SetupRunner(object):
                 return True
             key = raw_input(response)
 
-            if key.isspace() or key.lower() == 'y':
+            if key.isspace() or key == "" or  key.lower() == 'y':
                 return True
             elif key.lower() == 'n':
                 return False
