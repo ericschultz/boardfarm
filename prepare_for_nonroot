@@ -164,16 +164,15 @@ class SetupRunner(object):
         try:
             self.device.expect('\n0\r\n')
         except:
-            print("This program must be running as root. Try running with 'sudo'\n")
+            print("\nThis program must be running as root. Try running with 'sudo'\n")
             sys.exit(1)
 
     def notify_and_ask_for_permission(self, notification):
         response = "[Y|n]: "
         while True:
-            print(notification)
-            print('\n')
+            print("\n" + notification + '\n')
             if not(self.show_prompts):
-                print (response + "y\n")
+                print ('\n' + response + "y\n")
                 return True
             key = raw_input(response)
 
