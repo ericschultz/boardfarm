@@ -95,11 +95,14 @@ class SetupRunner(object):
         f = os.fdopen(fd, 'w+b')
         f.writelines(lines)
         f.close();
+        write_to_path = "/etc/sudoers.d/testing_sudoers"
         self.device.sendline("visudo -c -f " + path)
         self.device.expect(path + ': parsed OK')
+        if self.test:
+            print("\n" + "atomic rename of %s to %s" % (path, write_to_path))
         if not(self.test):
             #atomic rename
-            os.rename(path, "/etc/sudoers.d/testing_sudoers")
+            os.rename(path, write_to_path)
 
     def add_links_for_bins(self):
         if self.notify_and_ask_for_permission(LINKS_FOR_BIN):
@@ -108,9 +111,9 @@ class SetupRunner(object):
             for f in bins:
                 bin_file = os.path.join(bin_str, f)
                 command = "ln -fs %s /usr/bin/%s" % (bin_file, f)
-                self.device.sendline('echo "%s"' % command)
-                self.device.expect(SetupDevice.prompt)
-                if not(self.test):
+                if self.test:
+                    print("\n" + command)
+                else:
                     self.device.sendline(command)
                     self.device.expect(SetupDevice.prompt)
 
@@ -118,9 +121,9 @@ class SetupRunner(object):
         if self.notify_and_ask_for_permission(SET_CHMODS):
             for f in ["/bin/ip", "/bin/ping", "/bin/ping6", "/sbin/xtables-multi", "/sbin/ifconfig"]:
                 command = "chmod 4755 %s" % f
-                self.device.sendline('echo "%s"'% command)
-                self.device.expect(SetupDevice.prompt)
-                if not(self.test):
+                if self.test:
+                    print("\n" + command)
+                else:
                     self.device.sendline(command)
                     self.device.expect(SetupDevice.prompt)
 
@@ -137,13 +140,18 @@ class SetupRunner(object):
                 filename = 'lan_setup.service'
             elif self.type == 'wan':
                 filename = 'wan_setup.service'
+            else:
+                print("\nmust be lan or wan")
+                sys.exit(1)
 
             service_file = self.local_file('conf', filename)
 
-            command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
-            self.device.sendline('echo "%s"' % command)
-            self.device.expect(SetupDevice.prompt)
-            if not(self.test):
+            command = "cp -f %s /etc/systemd/system/%s" % (service_file, filename)
+            enable = 'systemctl enable %s' % filename
+            if self.test:
+                print("\n" + command)
+                print("\n" + enable)
+            else:
                 self.device.sendline(command)
                 self.device.expect(SetupDevice.prompt)
                 self.device.sendline('systemctl enable %s' % filename)
@@ -151,13 +159,18 @@ class SetupRunner(object):
 
     def setup_cron_for_dhclient_eth0(self):
         if self.notify_and_ask_for_permission(ADD_CRON_DHCLIENT):
-            if not(self.test):
-                self.device.sendline("ln -f %s /etc/systemd/system/%s" % (self.local_file("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'))
-                self.device.expect(SetupDevice.prompt)
-                self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
-                self.device.expect(SetupDevice.prompt)
-                self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_file("conf", 'boardfarm_cron'))
-                self.device.expect(SetupDevice.prompt)
+            lines = ["cp -f %s /etc/systemd/system/%s" % (self.local_file("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'),
+                        'systemctl enable %s' % 'dhclient.eth0.service',
+                        "ln -fs %s /etc/cron.d/boardfarm" % self.local_file("conf", 'boardfarm_cron')]
+            if self.test:
+                for f in lines:
+                    print("\n" + f)
+
+            else:
+                for f in lines:
+                    self.device.sendline(f)
+                    self.device.expect(SetupDevice.prompt)
+
 
     def check_if_root(self):
         self.device.sendline("id -u")
