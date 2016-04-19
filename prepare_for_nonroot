@@ -50,7 +50,7 @@ class SetupDevice(base.BaseDevice):
     def __init__(self):
         pexpect.spawn.__init__(self, command="bash")
         self.logfile_read = sys.stdout
-        self.color = blue
+        self.color = "blue"
 
 
     #we default to bin subdir
