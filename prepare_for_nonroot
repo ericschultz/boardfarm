@@ -53,7 +53,7 @@ class SetupDevice(base.BaseDevice):
         pexpect.spawn.__init__(self, command="bash")
         self.logfile_read = sys.stdout
         self.color = "blue"
-        cprint("device console = %s" % colored(color, color), None, attrs=['bold'])
+        cprint("device console = %s" % colored(self.color, self.color), None, attrs=['bold'])
 
     #we default to bin subdir
 class SetupRunner(object):
