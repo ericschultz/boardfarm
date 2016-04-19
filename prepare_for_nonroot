@@ -23,11 +23,37 @@ with the tests run as a non-root user. This script is idempotent, i.e. if your
 run it multiple times, it won't cause any problems.
 
 Unless you've set the '-y' argument, we'll ask you whether you want particular
-changes made to your system. In most cases, you should answer 'y'.
+changes made to your system. In almost cases, you should answer 'y'.
 '''
 
+ADD_CRON_DHCLIENT = '''
+If you set the IP address for eth0 via dhclient, boardfarm will likely
+cause the DHCP lease to not be renewed. This settings adds a cron job to
+check if dhclient for eth0 is running and, if not, restart it.
+'''
 
-class FakeDevice(base.BaseDevice):
+ADD_STARTUP = '''
+To get the system in a standard state, boardfarm can run some preparation
+scripts at startup.
+'''
+
+SET_CHMODS = '''
+We need to have some executables available to non-root users. These are mostly
+executables related to the network. Some executables include 'ping', 'ip',
+'xtables-multi' (for firewalls) and 'ifconfig'
+'''
+
+SUDOERS_HELP = '''
+Some commands must be run as root but we'd rather they be run via sudo. To make
+this possible, we add the testing user to a sudoers file.
+'''
+
+LINKS_FOR_BIN = '''
+Boardfarm expects that some scripts files will be in an expected location. These
+locations are the same as the ones added in the sudoers file.
+'''
+
+class SetupDevice(base.BaseDevice):
     prompt = ['.+\\@.*:.*(\$|#)']
     def __init__(self):
         pexpect.spawn.__init__(self, command="bash")
@@ -37,23 +63,25 @@ class FakeDevice(base.BaseDevice):
     #we default to bin subdir
 class SetupRunner(object):
 
-    def __init__(self,username, type, test=True):
-        self.device = FakeDevice()
+    def __init__(self, username, type, test=True, no_prompts=False):
+        self.device = SetupDevice()
         self.type = type
         self.username = username
         self.test = test
+        self.no_prompts = no_prompts
 
     def add_to_sudoers(self, template_file=None):
-        if template_file is None:
-            template_file = self.local_dir('conf', 'testing_sudoers')
-        f = open(template_file, 'rb')
-        lines = f.readlines()
-        f.close()
+        if notify_and_ask_for_permission(SUDOERS_HELP):
+            if template_file is None:
+                template_file = self.local_file('conf', 'testing_sudoers')
+            f = open(template_file, 'rb')
+            lines = f.readlines()
+            f.close()
 
-        testing_cmds_to_tester_regexp = "^__username__"
-        testing_cmds_to_tester_contents = "%s ALL=(ALL) NOPASSWD: TESTING_CMDS" % self.username
-        self.replace_or_add_line(lines, testing_cmds_to_tester_regexp, testing_cmds_to_tester_contents)
-        self.save_sudoers(lines)
+            testing_cmds_to_tester_regexp = "^__username__"
+            testing_cmds_to_tester_contents = "%s ALL=(ALL) NOPASSWD: TESTING_CMDS" % self.username
+            self.replace_or_add_line(lines, testing_cmds_to_tester_regexp, testing_cmds_to_tester_contents)
+            self.save_sudoers(lines)
 
     #inspired from Ansible but not enough to influence copyright
     def replace_or_add_line(self, lines, regex, line_to_make_present):
@@ -82,56 +110,62 @@ class SetupRunner(object):
             os.rename(path, "/etc/sudoers.d/testing_sudoers")
 
     def add_links_for_bins(self):
-        bin_str = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
-        bins = [ f for f in os.listdir(bin_str) if not(f.endswith('.sh')) ]
-        for f in bins:
-            bin_file = os.path.join(bin_str, f)
-            command = "ln -fs %s /usr/bin/%s" % (bin_file, f)
+        if notify_and_ask_for_permission(LINKS_FOR_BIN):
+            bin_str = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
+            bins = [ f for f in os.listdir(bin_str) if not(f.endswith('.sh')) ]
+            for f in bins:
+                bin_file = os.path.join(bin_str, f)
+                command = "ln -fs %s /usr/bin/%s" % (bin_file, f)
+                self.device.sendline('echo "%s"' % command)
+                self.device.expect(FakeDevice.prompt)
+                if not(self.test):
+                    self.device.sendline(command)
+                    self.device.expect(FakeDevice.prompt)
+
+    def set_chmods(self):
+        if notify_and_ask_for_permission(SET_CHMODS):
+            for f in ["/bin/ip", "/bin/ping", "/bin/ping6", "/sbin/xtables-multi", "/sbin/ifconfig"]:
+                command = "chmod 4755 %s" % f
+                self.device.sendline('echo "%s"'% command)
+                self.device.expect(FakeDevice.prompt)
+                if not(self.test):
+                    self.device.sendline(command)
+                    self.device.expect(FakeDevice.prompt)
+
+    def local_file(self, *path_parts):
+        '''Calculates the absolute path from path_parts relative to the boardfarm
+        directory'''
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)),*path_parts)
+
+    def add_to_startup(self):
+        if notify_and_ask_for_permission(ADD_STARTUP):
+            service_file = None
+            filename = None
+            if self.type == 'lan':
+                filename = 'lan_setup.service'
+            elif self.type == 'wan':
+                filename = 'wan_setup.service'
+
+            service_file = self.local_file('conf', filename)
+
+            command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
             self.device.sendline('echo "%s"' % command)
             self.device.expect(FakeDevice.prompt)
             if not(self.test):
                 self.device.sendline(command)
                 self.device.expect(FakeDevice.prompt)
-
-    def set_chmods(self):
-        for f in ["/bin/ip", "/bin/ping", "/bin/ping6", "/sbin/xtables-multi", "/sbin/ifconfig"]:
-            command = "chmod 4755 %s" % f
-            self.device.sendline('echo "%s"'% command)
-            self.device.expect(FakeDevice.prompt)
-            if not(self.test):
-                self.device.sendline(command)
+                self.device.sendline('systemctl enable %s' % filename)
                 self.device.expect(FakeDevice.prompt)
 
-    def local_dir(self, *path_parts):
-        return os.path.join(os.path.dirname(os.path.abspath(__file__)),*path_parts)
-
-    def add_to_startup(self):
-        service_file = None
-        filename = None
-        if self.type == 'lan':
-            filename = 'lan_setup.service'
-        elif self.type == 'wan':
-            filename = 'wan_setup.service'
-
-        service_file = self.local_dir('conf', filename)
-
-        command = "ln -f %s /etc/systemd/system/%s" % (service_file, filename)
-        self.device.sendline('echo "%s"' % command)
-        self.device.expect(FakeDevice.prompt)
-        if not(self.test):
-            self.device.sendline(command)
-            self.device.expect(FakeDevice.prompt)
-            self.device.sendline('systemctl enable %s' % filename)
-            self.device.expect(FakeDevice.prompt)
-
     def setup_cron_for_dhclient_eth0(self):
-        if not(self.test):
-            self.device.sendline("ln -f %s /etc/systemd/system/%s" % (self.local_dir("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'))
-            self.device.expect(FakeDevice.prompt)
-            self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
-            self.device.expect(FakeDevice.prompt)
-            self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_dir("conf", 'boardfarm_cron'))
-            self.device.expect(FakeDevice.prompt)
+        if notify_and_ask_for_permission(ADD_CRON_DHCLIENT):
+            if not(self.test):
+                self.device.sendline("ln -f %s /etc/systemd/system/%s" % (self.local_file("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'))
+                self.device.expect(FakeDevice.prompt)
+                self.device.sendline('systemctl enable %s' % 'dhclient.eth0.service')
+                self.device.expect(FakeDevice.prompt)
+                self.device.sendline("ln -fs %s /etc/cron.d/boardfarm" % self.local_file("conf", 'boardfarm_cron'))
+                self.device.expect(FakeDevice.prompt)
 
     def check_if_root(self):
         self.device.sendline("id -u")
@@ -141,29 +175,44 @@ class SetupRunner(object):
             print("This program must be running as root. Try running with 'sudo'")
             sys.exit(1)
 
+    def notify_and_ask_for_permission(self, notification):
+        response = "[Y|n]: "
+        while True:
+            print(notification)
+            print('\n')
+            if self.no_prompts:
+                print (response + "y\n")
+                return True
+            key = raw_input(response)
+
+            if key.lower() == 'y':
+                return True
+            elif key.lower() == 'n':
+                return False
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Prepare to run this device as non-root',
-                                     usage='prepare_for_non_root [options...]',
+                                     usage='prepare_for_non_root type [options...]',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("type", type=str, default=None, help="Set this device up as LAN device")
-    parser.add_argument('-b', '--bin_dir', metavar='', type=str, default='/usr/bin', help='Directory where the links to your binaries. Defaults to "/usr/local/bin"')
-    parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who has sudo access scripts. Default is "tester"')
+    parser.add_argument("type", choices=['lan', 'wan'], help="Set this device up as a LAN or WAN device")
+    parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who will run your boardfarm tests. Default is "tester"')
     parser.add_argument('-y', '--no_prompts', action='store_true', help='Answer yes to all prompts. Used for automated systems')
     parser.add_argument('-t', '--run_test', action='store_true', help="Run a command as a test (development only)");
 
     args = parser.parse_args()
 
-    if args.type != "lan" and args.type != "wan":
-        print("You must choose LAN or WAN")
-        parser.print_help();
-        sys.exit(1)
+    runner = SetupRunner(username=args.user, type=args.type, test=args.run_test, no_prompts=args.no_prompts)
+    print(GET_STARTED)
 
-    runner = SetupRunner(username=args.user, type=args.type, test=args.run_test)
     runner.check_if_root()
+
     runner.add_to_sudoers()
 
     runner.add_links_for_bins()
+
     runner.set_chmods()
+
     runner.add_to_startup()
     runner.setup_cron_for_dhclient_eth0()
