@@ -9,21 +9,13 @@ import shutil
 
 from devices import base
 
-HELP_EPILOG = '''
-Example use:
-
- bft -b ap148 --testsuite flash_only -m http://10.0.0.101/nand-ipq806x-single.img
-
- bft -b ap135 --testsuite preflight -r http://10.0.0.101/openwrt-ar71xx-generic-ap135-rootfs-squashfs.bin
-'''
-
 GET_STARTED = '''
 This program prepares a system to run as a LAN or WAN system
 with the tests run as a non-root user. This script is idempotent, i.e. if your
 run it multiple times, it won't cause any problems.
 
 If you've set the '-p' argument, we'll ask you whether you want particular
-changes made to your system. In almost cases, you should answer 'y'.
+changes made to your system. In almost all cases, you should answer 'y'.
 '''
 
 ADD_CRON_DHCLIENT = '''
