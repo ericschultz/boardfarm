@@ -71,7 +71,7 @@ class SetupRunner(object):
         self.show_prompts = show_prompts
 
     def add_to_sudoers(self, template_file=None):
-        if notify_and_ask_for_permission(SUDOERS_HELP):
+        if self.notify_and_ask_for_permission(SUDOERS_HELP):
             if template_file is None:
                 template_file = self.local_file('conf', 'testing_sudoers')
             f = open(template_file, 'rb')
@@ -110,7 +110,7 @@ class SetupRunner(object):
             os.rename(path, "/etc/sudoers.d/testing_sudoers")
 
     def add_links_for_bins(self):
-        if notify_and_ask_for_permission(LINKS_FOR_BIN):
+        if self.notify_and_ask_for_permission(LINKS_FOR_BIN):
             bin_str = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bin')
             bins = [ f for f in os.listdir(bin_str) if not(f.endswith('.sh')) ]
             for f in bins:
@@ -123,7 +123,7 @@ class SetupRunner(object):
                     self.device.expect(FakeDevice.prompt)
 
     def set_chmods(self):
-        if notify_and_ask_for_permission(SET_CHMODS):
+        if self.notify_and_ask_for_permission(SET_CHMODS):
             for f in ["/bin/ip", "/bin/ping", "/bin/ping6", "/sbin/xtables-multi", "/sbin/ifconfig"]:
                 command = "chmod 4755 %s" % f
                 self.device.sendline('echo "%s"'% command)
@@ -138,7 +138,7 @@ class SetupRunner(object):
         return os.path.join(os.path.dirname(os.path.abspath(__file__)),*path_parts)
 
     def add_to_startup(self):
-        if notify_and_ask_for_permission(ADD_STARTUP):
+        if self.notify_and_ask_for_permission(ADD_STARTUP):
             service_file = None
             filename = None
             if self.type == 'lan':
@@ -158,7 +158,7 @@ class SetupRunner(object):
                 self.device.expect(FakeDevice.prompt)
 
     def setup_cron_for_dhclient_eth0(self):
-        if notify_and_ask_for_permission(ADD_CRON_DHCLIENT):
+        if self.notify_and_ask_for_permission(ADD_CRON_DHCLIENT):
             if not(self.test):
                 self.device.sendline("ln -f %s /etc/systemd/system/%s" % (self.local_file("conf", 'dhclient.eth0.service'), 'dhclient.eth0.service'))
                 self.device.expect(FakeDevice.prompt)
@@ -170,9 +170,9 @@ class SetupRunner(object):
     def check_if_root(self):
         self.device.sendline("id -u")
         try:
-            self.device.expect('^0')
+            self.device.expect('\n0\r\n')
         except:
-            print("This program must be running as root. Try running with 'sudo'")
+            print("This program must be running as root. Try running with 'sudo'\n")
             sys.exit(1)
 
     def notify_and_ask_for_permission(self, notification):
