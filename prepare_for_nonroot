@@ -204,7 +204,7 @@ if __name__ == '__main__':
                                      usage='prepare_for_non_root type [options...]',
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("type", choices=['lan', 'wan'], help="Set this device up as a LAN or WAN device")
-    parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who will run your boardfarm tests. Default is "tester"')
+    parser.add_argument('-u', '--user', metavar='', type=str, default='tester', help='Non-root user who will run your boardfarm tests. Default is "tester". This user should be created before your run this test.')
     parser.add_argument('-p', '--show_prompts', action='store_true', help='Show the prompts to have more granular control')
     parser.add_argument('-t', '--run_test', action='store_true', help="Run a command as a test (development only)");
 
