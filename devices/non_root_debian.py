@@ -92,8 +92,9 @@ class NonRootDebianBox(base.BaseDevice):
                 time.sleep(15)
                 break
         self.__init__(self.name, self.color,
-                      self.output, self.username,
+                      self.username,
                       self.password, self.port,
+                      output=self.output,
                       reboot=False)
 
     def get_ip_addr(self, interface):
