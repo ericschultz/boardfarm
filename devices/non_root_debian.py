@@ -76,7 +76,7 @@ class NonRootDebianBox(base.BaseDevice):
 
     def reset(self):
         self.sendline('sudo reboot')
-        self.expect(['going down','disconnected'])
+        self.expect(['going down','disconnected', 'closed'])
         try:
             self.expect(self.prompt, timeout=10)
         except:
