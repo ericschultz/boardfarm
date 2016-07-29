@@ -82,7 +82,7 @@ class NonRootDebianBox(base.BaseDevice):
         except:
             pass
         time.sleep(15)  # Wait for the network to go down.
-        for i in range(0, 20):
+        for i in range(0, 50):
             try:
                 pexpect.spawn('ping -w 1 -c 1 ' + self.name).expect('64 bytes', timeout=1)
             except:
