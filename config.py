@@ -26,3 +26,6 @@ elasticsearch_server = 'http://etc.prplfoundation.org:9200/'
 # Code change server like gerrit, github, etc... Used only in display
 # of the results html file to list links to code changes tested.
 code_change_server = None
+
+# Reboot the LAN/WAN/WLAN devices before running bft
+reboot_vms = True
