@@ -39,8 +39,7 @@ class OpenWrtRouter(base.BaseDevice):
 
     prompt = ['root\\@.*:.*#', '/ # ', '@R7500:/# ']
     uprompt = ['ath>', '\(IPQ\) #', 'ar7240>', '\(IPQ40xx\)']
-    uprompt_commands = [{'command': 'echo FOO', 'expect': 'FOO'},
-                        {'command': 'version', 'expect': 'U-Boot'}]
+    uprompt_commands = [{'command': 'echo FOO', 'expect': 'FOO'}, {'command': 'version', 'expect': 'U-Boot'}]
     linux_booted = False
 
     def __init__(self,
