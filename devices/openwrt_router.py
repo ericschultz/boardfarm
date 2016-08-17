@@ -234,20 +234,23 @@ class OpenWrtRouter(base.BaseDevice):
         variables needed for flashing.
         '''
         # Try to break into uboot
+
         for attempt in range(4):
-            try:
-                self.expect('U-Boot', timeout=30)
-                self.expect('Hit any key ')
-                self.sendline('\n\n\n\n\n\n\n') # try really hard
-                self.expect(self.uprompt, timeout=4)
-                self.sendline('echo FOO')
-                self.expect('echo FOO')
-                self.expect('FOO')
-                self.expect(self.uprompt, timeout=4)
-                break
-            except:
-                print('\n\nFailed to break into uboot, try again.')
-                self.reset()
+            for i in self.uprompt_commands:
+                try:
+                    print("Going to try %s: %s" % (i['command'], i['expect']))
+                    self.expect('U-Boot', timeout=30)
+                    self.expect('Hit any key ')
+                    self.sendline('\n\n\n\n\n\n\n') # try really hard
+                    self.expect(self.uprompt, timeout=4)
+                    self.sendline(i['command'])
+                    self.expect(i['command'], timeout=4)
+                    self.expect(i['expect'])
+                    self.expect(self.uprompt, timeout=4)
+                    return
+                except Exception as e:
+                    print(e)
+                    print("\nWe appeared to have failed to break into U-Boot...")
         else:
             # Tried too many times without success
             print('\nUnable to break into U-Boot, test will likely fail')
