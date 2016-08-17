@@ -249,8 +249,8 @@ class OpenWrtRouter(base.BaseDevice):
                     self.expect(self.uprompt, timeout=4)
                     return
                 except Exception as e:
-                    print(e)
-                    print("\nWe appeared to have failed to break into U-Boot...")
+                    print('\n\nFailed to break into uboot, try again.')
+                    self.reset()
         else:
             # Tried too many times without success
             print('\nUnable to break into U-Boot, test will likely fail')
