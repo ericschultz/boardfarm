@@ -88,10 +88,12 @@ class OpenWrtRouter(base.BaseDevice):
             self.power.reset()
             return
         broke_in = False
-        for i in self.uprompt_commands:
-            for attempt in range(3):
+
+        for attempt in range(3):
+            for i in self.uprompt_commands:
                 try:
                     self.power.reset()
+                    print("Going to try %s: %s" % (i['command'], i['expect']))
                     self.expect('U-Boot', timeout=30)
                     self.expect('Hit any key ')
                     self.sendline('\n\n\n\n\n\n\n') # try really hard
