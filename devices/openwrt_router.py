@@ -39,6 +39,8 @@ class OpenWrtRouter(base.BaseDevice):
 
     prompt = ['root\\@.*:.*#', '/ # ', '@R7500:/# ']
     uprompt = ['ath>', '\(IPQ\) #', 'ar7240>', '\(IPQ40xx\)']
+    uprompt_commands = [{'command': 'echo FOO', 'expect': 'FOO'},
+                        {'command': 'version', 'expect': 'U-Boot'}]
     linux_booted = False
 
     def __init__(self,
@@ -85,21 +87,25 @@ class OpenWrtRouter(base.BaseDevice):
         if not break_into_uboot:
             self.power.reset()
             return
-        for attempt in range(3):
-            try:
-                self.power.reset()
-                self.expect('U-Boot', timeout=30)
-                self.expect('Hit any key ')
-                self.sendline('\n\n\n\n\n\n\n') # try really hard
-                self.expect(self.uprompt, timeout=4)
-                self.sendline('echo FOO')
-                self.expect('echo FOO', timeout=4)
-                self.expect('FOO')
-                self.expect(self.uprompt, timeout=4)
-                return
-            except Exception as e:
-                print(e)
-                print("\nWe appeared to have failed to break into U-Boot...")
+        broke_in = False
+        for i in self.uprompt_commands:
+            for attempt in range(3):
+                try:
+                    self.power.reset()
+                    self.expect('U-Boot', timeout=30)
+                    self.expect('Hit any key ')
+                    self.sendline('\n\n\n\n\n\n\n') # try really hard
+                    self.expect(self.uprompt, timeout=4)
+                    self.sendline(i['command'])
+                    self.expect(i['command'], timeout=4)
+                    self.expect(i['expect'])
+                    self.expect(self.uprompt, timeout=4)
+                    return
+                except Exception as e:
+                    print(e)
+                    print("\nWe appeared to have failed to break into U-Boot...")
+        if not(broke_in):
+            print("\nWe've completely failed to break into U-Boot...")
 
     def get_ip_addr(self, interface):
         '''Return IP Address for given interface.'''
