@@ -320,9 +320,14 @@ class OpenWrtRouter(base.BaseDevice):
         self.sendline('setenv ethact eth0')
         self.expect(self.uprompt)
         time.sleep(30) # running dhcp too soon causes hang
-        self.sendline('dhcp')
-        self.expect('DHCP client bound to address', timeout=60)
-        self.expect(self.uprompt)
+        try:
+            self.sendline('dhcp')
+            self.expect('DHCP client bound to address', timeout=60)
+            self.expect(self.uprompt)
+        except:
+
+            self.sendline('setenv ipaddr 192.168.0.10')
+            self.expect(self.uprompt)
         self.sendline('setenv serverip %s' % TFTP_SERVER)
         self.expect(self.uprompt)
         if TFTP_SERVER:
