@@ -34,7 +34,7 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
             self.rootfs_addr = "0x9f050000"
         elif self.model in ("ap143"):
             self.kernel_addr = "0x9f400000"
-            self.kernel_addr = "0x9f050000"
+            self.rootfs_addr = "0x9f050000"
         else:
             common.print_bold("Model %s does not have a setting in QcomMipsRouter.check_memory_addresses. Check your model name for typos" % self.model)
 
