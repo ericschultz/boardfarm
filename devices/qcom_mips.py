@@ -58,9 +58,10 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         self.expect(self.uprompt)
         self.sendline('cp.b $fileaddr %s $filesize' % self.rootfs_addr)
         self.expect('done', timeout=80)
-        self.expect(self.uprompt)
-        self.sendline('cmp.b $fileaddr %s $filesize' % self.rootfs_addr)
-        self.expect('Total of .* bytes were the same')
+        if model != 'ap143':
+            self.expect(self.uprompt)
+            self.sendline('cmp.b $fileaddr %s $filesize' % self.rootfs_addr)
+            self.expect('Total of .* bytes were the same')
 
     def flash_linux(self, KERNEL):
         common.print_bold("\n===== Flashing linux =====\n")
@@ -79,9 +80,10 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         self.expect(self.uprompt)
         self.sendline('cp.b $fileaddr %s $filesize' % self.kernel_addr)
         self.expect('done', timeout=60)
-        self.sendline('cmp.b $fileaddr %s $filesize' % self.kernel_addr)
-        self.expect('Total of .* bytes were the same')
-        self.expect(self.uprompt)
+        if model != 'ap143':
+            self.sendline('cmp.b $fileaddr %s $filesize' % self.kernel_addr)
+            self.expect('Total of .* bytes were the same')
+            self.expect(self.uprompt)
 
     def boot_linux(self, rootfs=None):
         common.print_bold("\n===== Booting linux for %s on %s =====" % (self.model, self.root_type))
