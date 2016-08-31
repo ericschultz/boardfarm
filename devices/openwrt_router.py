@@ -237,9 +237,10 @@ class OpenWrtRouter(base.BaseDevice):
         self.check_memory_addresses()
 
         # save env first, so CRC is OK for later tests
-        self.sendline("saveenv")
-        self.expect(["Writing to Nand... done", "Protected 1 sectors"])
-        self.expect(self.uprompt)
+        if self.model != 'ap143':
+            self.sendline("saveenv")
+            self.expect(["Writing to Nand... done", "Protected 1 sectors"])
+            self.expect(self.uprompt)
 
 
     def attempt_to_break_into_uboot(self):
