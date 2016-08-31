@@ -39,7 +39,6 @@ class OpenWrtRouter(base.BaseDevice):
 
     prompt = ['root\\@.*:.*#', '/ # ', '@R7500:/# ']
     uprompt = ['ath>', '\(IPQ\) #', 'ar7240>', '\(IPQ40xx\)']
-    uprompt_commands = [{'command': 'echo FOO', 'expect': 'FOO'}, {'command': 'version', 'expect': 'U-Boot'}]
     linux_booted = False
 
     def __init__(self,
@@ -89,24 +88,13 @@ class OpenWrtRouter(base.BaseDevice):
         broke_in = False
 
         for attempt in range(3):
-            for i in self.uprompt_commands:
-                try:
-                    print("Going to try %s: %s" % (i['command'], i['expect']))
-                    self.power.reset()
-                    self.expect('U-Boot', timeout=30)
-                    self.expect('Hit any key ')
-                    self.sendline('\n\n\n\n\n\n\n') # try really hard
-                    self.expect(self.uprompt, timeout=4)
-                    self.sendline(i['command'])
-                    self.expect(i['command'], timeout=4)
-                    self.expect(i['expect'])
-                    self.expect(self.uprompt, timeout=4)
-                    return
-                except Exception as e:
-                    print(e)
-                    print("\nWe appeared to have failed to break into U-Boot...")
-        if not(broke_in):
-            print("\nWe've completely failed to break into U-Boot...")
+            try:
+                self.power.reset()
+                self.attempt_to_break_into_uboot()
+                return
+            except Exception as e:
+                print(e)
+                print("\nWe appeared to have failed to break into U-Boot...")
 
     def get_ip_addr(self, interface):
         '''Return IP Address for given interface.'''
@@ -236,21 +224,12 @@ class OpenWrtRouter(base.BaseDevice):
         # Try to break into uboot
 
         for attempt in range(4):
-            for i in self.uprompt_commands:
-                try:
-                    print("Going to try %s: %s" % (i['command'], i['expect']))
-                    self.expect('U-Boot', timeout=30)
-                    self.expect('Hit any key ')
-                    self.sendline('\n\n\n\n\n\n\n') # try really hard
-                    self.expect(self.uprompt, timeout=4)
-                    self.sendline(i['command'])
-                    self.expect(i['command'], timeout=4)
-                    self.expect(i['expect'])
-                    self.expect(self.uprompt, timeout=4)
-                    return
-                except Exception as e:
-                    print('\n\nFailed to break into uboot, try again.')
-                    self.reset()
+            try:
+                self.attempt_to_break_into_uboot()
+                return
+            except Exception as e:
+                print('\n\nFailed to break into uboot, try again.')
+                self.reset()
         else:
             # Tried too many times without success
             print('\nUnable to break into U-Boot, test will likely fail')
@@ -261,6 +240,21 @@ class OpenWrtRouter(base.BaseDevice):
         self.sendline("saveenv")
         self.expect(["Writing to Nand... done", "Protected 1 sectors"])
         self.expect(self.uprompt)
+
+
+    def attempt_to_break_into_uboot(self):
+        '''reuseable function to break into uboot.
+        If it fails, an exception is raised'''
+        self.expect('U-Boot', timeout=30)
+        self.expect('Hit any key ')
+        self.sendline('\n\n\n\n\n\n\n') # try really hard
+        self.expect(self.uprompt, timeout=4)
+        # Confirm we are in uboot by typing any command.
+        # If we weren't in uboot, we wouldn't see the command
+        # that we type.
+        self.sendline('echo FOO')
+        self.expect('echo FOO', timeout=4)
+        self.expect(self.uprompt, timeout=4)
 
     def kill_console_at_exit(self):
         self.kill(signal.SIGHUP)
