@@ -226,7 +226,7 @@ class OpenWrtRouter(base.BaseDevice):
         for attempt in range(4):
             try:
                 self.attempt_to_break_into_uboot()
-                return
+                break
             except Exception as e:
                 print('\n\nFailed to break into uboot, try again.')
                 self.reset()
