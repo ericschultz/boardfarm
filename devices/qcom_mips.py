@@ -58,7 +58,7 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         self.expect(self.uprompt)
         self.sendline('cp.b $fileaddr %s $filesize' % self.rootfs_addr)
         self.expect('done', timeout=80)
-        if model != 'ap143':
+        if self.model != 'ap143':
             self.expect(self.uprompt)
             self.sendline('cmp.b $fileaddr %s $filesize' % self.rootfs_addr)
             self.expect('Total of .* bytes were the same')
@@ -80,7 +80,7 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         self.expect(self.uprompt)
         self.sendline('cp.b $fileaddr %s $filesize' % self.kernel_addr)
         self.expect('done', timeout=60)
-        if model != 'ap143':
+        if self.model != 'ap143':
             self.sendline('cmp.b $fileaddr %s $filesize' % self.kernel_addr)
             self.expect('Total of .* bytes were the same')
             self.expect(self.uprompt)
