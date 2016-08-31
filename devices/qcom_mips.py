@@ -7,7 +7,6 @@
 
 import common
 import openwrt_router
-import warnings
 
 
 class QcomMipsRouter(openwrt_router.OpenWrtRouter):
@@ -34,7 +33,7 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
             self.kernel_addr = "0x9f680000"
             self.rootfs_addr = "0x9f050000"
         else:
-            warnings.warn("Model %s does not have a setting in QcomMipsRouter.check_memory_addresses. Check your model name for typos" % self.model)
+            common.print_bold("Model %s does not have a setting in QcomMipsRouter.check_memory_addresses. Check your model name for typos" % self.model)
 
     def flash_rootfs(self, ROOTFS):
         '''Flash Root File System image'''
