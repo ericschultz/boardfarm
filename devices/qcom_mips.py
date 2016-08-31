@@ -29,9 +29,12 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
             # would be nice to dynamically detect these
             self.kernel_addr = "0x9fe80000"
             self.rootfs_addr = "0x9f050000"
-        elif self.model in ("db120", "ap143", "ap151", "ap152-8M"):
+        elif self.model in ("db120", "ap151", "ap152-8M"):
             self.kernel_addr = "0x9f680000"
             self.rootfs_addr = "0x9f050000"
+        elif self.model in ("ap143"):
+            self.kernel_addr = "0x9f400000"
+            self.kernel_addr = "0x9f050000"
         else:
             common.print_bold("Model %s does not have a setting in QcomMipsRouter.check_memory_addresses. Check your model name for typos" % self.model)
 
