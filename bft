@@ -54,7 +54,7 @@ def main():
                                                  power_ip=config.board.get('powerip', None),
                                                  power_outlet=config.board.get('powerport', None),
                                                  web_proxy=config.board.get('lan_device', None),
-                                                 tftp_server=config.board.get('wan_device', None),
+                                                 tftp_server=config.board.get('tftp_server', config.board.get('wan_device', None)),
                                                  tftp_username=config.board.get('wan_username', 'root'),
                                                  tftp_password=config.board.get('wan_password', 'bigfoot1'),
                                                  connection_type=config.board.get('connection_type', None),

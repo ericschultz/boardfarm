@@ -10,12 +10,13 @@ import qcom_akronite_nand
 import qcom_akronite_nor
 import qcom_dakota_nor
 import qcom_mips
+import lantiq
 
 def board(model, **kwargs):
     '''
     Depending on the given model, return an object of the appropriate class type.
 
-    Different boards are flashed with different commands, have 
+    Different boards are flashed with different commands, have
     different memory addresses, and must be handled differently.
     '''
     if model in ("db120", "ap135", "ap143", "ap147", "ap152", "ap151",
@@ -31,6 +32,9 @@ def board(model, **kwargs):
 
     if model in ("dk01-nor"):
         return qcom_dakota_nor.QcomDakotaRouterNOR(model, **kwargs)
+
+    if model in ('easy80920'):
+        return lantiq.LantiqRouter(model, **kwargs)
 
     # Default for all other models
     print("\nWARNING: Unknown board model '%s'." % model)
