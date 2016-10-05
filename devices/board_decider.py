@@ -10,6 +10,7 @@ import qcom_akronite_nand
 import qcom_akronite_nor
 import qcom_dakota_nor
 import qcom_mips
+import lantiq
 
 def board(model, **kwargs):
     '''
