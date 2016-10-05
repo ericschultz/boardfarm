@@ -14,12 +14,15 @@ class RootFSBootTest(linux_boot.LinuxBootTest):
     '''Flashed image and booted successfully.'''
 
     def boot(self, reflash=True):
+        '''
+        if not wan or tftp
         if not wan:
             msg = 'No WAN Device defined, skipping flash.'
             lib.common.test_msg(msg)
             self.skipTest(msg)
-
-        wan.configure(kind="wan_device")
+        '''
+        if wan:
+            wan.configure(kind="wan_device")
         if lan:
             lan.configure(kind="lan_device")
 
