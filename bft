@@ -106,12 +106,19 @@ def main():
             # If we find a dynamic device with the tftpd-server option let's use that for the server
             # otherwise we use the device with the 'wan' name
             tftp_server = None
+            tftp_username = None
+            tftp_password = None
             if 'devices' in config.board:
-                tftp_servers = [ x['ipaddr'] for x in config.board['devices'] if 'tftpd-server' in x.get('options', "") ]
+                tftp_servers = [ for x in config.board['devices'] if 'tftpd-server' in x.get('options', "") ]
                 if len(tftp_servers) == 1:
-                    tftp_server = tftp_servers[0]
+                    tftp_server = tftp_servers[0]['ipaddr']
+                    tftp_username = tftp_servers[0]['username']
+                    tftp_password = tftp_servers[0]['password']
             elif tftp_server is None:
-                tftp_server = [ x['ipaddr'] for x in config.board['devices'] if x['name'] == 'wan' ][0]
+                tftp_servers = [ for x in config.board['devices'] if x['name'] == 'wan' ]
+                tftp_server = tftp_servers[0]['ipaddr']
+                tftp_username = tftp_serers[0]['username']
+                tftp_password = tftp_serers[0]['password']
 
             # Connect to board
             config.console = board_decider.board(config.board['board_type'],
@@ -120,8 +127,8 @@ def main():
                                                  power_outlet=config.board.get('powerport', None),
                                                  web_proxy=config.board.get('lan_device', None),
                                                  tftp_server=config.board.get('wan_device', tftp_server),
-                                                 tftp_username=config.board.get('wan_username', 'root'),
-                                                 tftp_password=config.board.get('wan_password', 'bigfoot1'),
+                                                 tftp_username=config.board.get('wan_username', "root" if tftp_username is None else tftp_username),
+                                                 tftp_password=config.board.get('wan_password', 'bigfoot1' if tftp_password is None else tftp_password),
                                                  connection_type=config.board.get('connection_type', None),
                                                  power_username=config.board.get('power_username', None),
                                                  power_password=config.board.get('power_password', None))
