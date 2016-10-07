@@ -109,13 +109,13 @@ def main():
             tftp_username = None
             tftp_password = None
             if 'devices' in config.board:
-                tftp_servers = [ for x in config.board['devices'] if 'tftpd-server' in x.get('options', "") ]
+                tftp_servers = [ x in config.board['devices'] if 'tftpd-server' in x.get('options', "") ]
                 if len(tftp_servers) == 1:
                     tftp_server = tftp_servers[0]['ipaddr']
                     tftp_username = tftp_servers[0]['username']
                     tftp_password = tftp_servers[0]['password']
             elif tftp_server is None:
-                tftp_servers = [ for x in config.board['devices'] if x['name'] == 'wan' ]
+                tftp_servers = [ x in config.board['devices'] if x['name'] == 'wan' ]
                 tftp_server = tftp_servers[0]['ipaddr']
                 tftp_username = tftp_serers[0]['username']
                 tftp_password = tftp_serers[0]['password']
