@@ -339,7 +339,7 @@ class OpenWrtRouter(base.BaseDevice):
                     self.expect('<INTERRUPT>')
                     self.expect(self.uprompt)
                     self.sendline("ping $serverip")
-                    self.expect("host %s is alive" % TFTP_SERVER)
+                    self.expect(["host %s is alive" % TFTP_SERVER, "Unknown command 'ping'"]) # we're happy either way
                     self.expect(self.uprompt)
                     passed = True
                     break
