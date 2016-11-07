@@ -22,6 +22,7 @@ class LantiqRouter(openwrt_router.OpenWrtRouter):
     def flash_meta(self, META_BUILD):
         common.print_bold("\n===== Flashing image on=====\n")
         file = self.prepare_file(META_BUILD)
+        file = file[file.find('/tftpboot'):]
         self.sendline('setenv fullimage %s' % file)
         self.expect(self.uprompt)
         self.sendline('setenv tftppath ' )
