@@ -11,6 +11,7 @@ import qcom_akronite_nor
 import qcom_dakota_nor
 import qcom_mips
 import lantiq
+import marvell
 
 def board(model, **kwargs):
     '''
@@ -20,7 +21,7 @@ def board(model, **kwargs):
     different memory addresses, and must be handled differently.
     '''
     if model in ("db120", "ap135", "ap143", "ap147", "ap152", "ap151",
-                 "ap151-16M", "ap143", "ap152-8M"):
+                 "ap151-16M", "ap143", "ap152-8M", "tew-823dru"):
         return qcom_mips.QcomMipsRouter(model, **kwargs)
 
     if model in ("ipq8066", "db149", "ap145", "ap148", "ap148-osprey",
@@ -35,6 +36,8 @@ def board(model, **kwargs):
 
     if model in ('easy80920'):
         return lantiq.LantiqRouter(model, **kwargs)
+    if model in ("wrt3200acm"):
+        return marvell.MarvellBoard(model, **kwargs)
 
     # Default for all other models
     print("\nWARNING: Unknown board model '%s'." % model)

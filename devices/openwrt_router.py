@@ -39,7 +39,9 @@ class OpenWrtRouter(base.BaseDevice):
 
     prompt = ['root\\@.*:.*#', '/ # ', '@R7500:/# ']
     uprompt = ['ath>', '\(IPQ\) #', 'ar7240>', '\(IPQ40xx\)']
+    uboot_eth = "eth0"
     linux_booted = False
+    saveenv_safe = True
 
     def __init__(self,
                  model,
@@ -59,11 +61,12 @@ class OpenWrtRouter(base.BaseDevice):
 
 
         if connection_type is None:
+            print("\nWARNING: Unknown connection type using ser2net\n")
             connection_type = "ser2net"
 
-        self.logfile_read = output
         self.connection = connection_decider.connection(connection_type, device=self, conn_cmd=conn_cmd, **kwargs)
         self.connection.connect()
+        self.logfile_read = output
 
         self.power = power.get_power_device(power_ip, outlet=power_outlet, username=power_username, password=power_password)
         self.model = model
@@ -200,7 +203,7 @@ class OpenWrtRouter(base.BaseDevice):
                random.randint(0x00, 0xff)]
         return ':'.join(map(lambda x: "%02x" % x, mac))
 
-    def check_memory_addresses():
+    def check_memory_addresses(self):
         '''Check/set memory addresses and size for proper flashing.'''
         pass
 
@@ -215,6 +218,9 @@ class OpenWrtRouter(base.BaseDevice):
 
     def flash_meta(self, META_BUILD):
         raise Exception('Code not written for flash_meta for this board type, %s.' % self.model)
+
+    def prepare_nfsroot(self, NFSROOT):
+        raise Exception('Code not written for prepare_nfsroot for this board type, %s.' % self.model)
 
     def wait_for_boot(self):
         '''
@@ -233,29 +239,14 @@ class OpenWrtRouter(base.BaseDevice):
         else:
             # Tried too many times without success
             print('\nUnable to break into U-Boot, test will likely fail')
-
-        self.check_memory_addresses()
-
         # save env first, so CRC is OK for later tests
-        if self.model != 'ap143':
-            self.sendline("saveenv")
-            self.expect(["Writing to Nand... done", "Protected 1 sectors"])
-            self.expect(self.uprompt)
+        self.check_memory_addresses()
+        self.sendline("saveenv")
+        self.expect(["Writing to Nand... done", "Protected 1 sectors", "Saving Environment to NAND..."])
+        self.expect(self.uprompt)
 
 
-    def attempt_to_break_into_uboot(self):
-        '''reuseable function to break into uboot.
-        If it fails, an exception is raised'''
-        self.expect('U-Boot', timeout=30)
-        self.expect('Hit any key ')
-        self.sendline('\n\n\n\n\n\n\n') # try really hard
-        self.expect(self.uprompt, timeout=4)
-        # Confirm we are in uboot by typing any command.
-        # If we weren't in uboot, we wouldn't see the command
-        # that we type.
-        self.sendline('echo FOO')
-        self.expect('echo FOO', timeout=4)
-        self.expect(self.uprompt, timeout=4)
+
 
     def kill_console_at_exit(self):
         self.kill(signal.SIGHUP)
@@ -318,16 +309,14 @@ class OpenWrtRouter(base.BaseDevice):
         # Use standard eth1 address of wan-side computer
         self.sendline('setenv autoload no')
         self.expect(self.uprompt)
-        self.sendline('setenv ethact eth0')
+        self.sendline('setenv ethact %s' % self.uboot_eth)
         self.expect(self.uprompt)
         time.sleep(30) # running dhcp too soon causes hang
-        try:
-            self.sendline('dhcp')
-            self.expect('DHCP client bound to address', timeout=60)
-            self.expect(self.uprompt)
-        except:
-
-            self.sendline('setenv ipaddr 192.168.0.10')
+        self.sendline('dhcp')
+        i = self.expect(['Unknown command', 'DHCP client bound to address'], timeout=60)
+        self.expect(self.uprompt)
+        if i == 0:
+            self.sendline('setenv ipaddr 192.168.0.2')
             self.expect(self.uprompt)
         self.sendline('setenv serverip %s' % TFTP_SERVER)
         self.expect(self.uprompt)
@@ -358,8 +347,9 @@ class OpenWrtRouter(base.BaseDevice):
                 time.sleep(1)
             assert passed
         self.sendline('setenv dumpdir crashdump')
-        self.expect(self.uprompt)
-        self.sendline('saveenv')
+        if self.saveenv_safe:
+            self.expect(self.uprompt)
+            self.sendline('saveenv')
         self.expect(self.uprompt)
 
     def boot_linux(self, rootfs=None):
@@ -368,7 +358,12 @@ class OpenWrtRouter(base.BaseDevice):
 
     def wait_for_linux(self):
         '''Verify Linux starts up.'''
-        self.expect(['Booting Linux', 'Starting kernel ...'], timeout=45)
+        i = self.expect(['Reset Button Push down', 'Booting Linux', 'Starting kernel ...'], timeout=45)
+        if i == 0:
+            self.expect('httpd')
+            self.sendcontrol('c')
+            self.expect(self.uprompt)
+            self.sendline('boot')
         i = self.expect(['Please press Enter to activate this console', 'U-Boot'], timeout=150)
         if i == 1:
             raise Exception('U-Boot came back when booting kernel')
@@ -425,6 +420,21 @@ class OpenWrtRouter(base.BaseDevice):
         self.sendline('uci set firewall.@rule[-1].target=%s' % target)
         self.sendline('uci commit firewall')
         self.firewall_restart()
+
+    def wait_for_mounts(self):
+        # wait for overlay to finish mounting
+        for i in range(5):
+            try:
+                self.sendline('mount')
+                self.expect_exact('overlayfs:/overlay on / type overlay')
+                self.expect(prompt)
+            except:
+                if i == 4:
+                    print("WARN: Overlay still not mounted")
+                else:
+                    pass
+            else:
+                break
 
     # Optional send and expect functions to try and be fancy at catching errors
     in_detect_fatal_error = False

@@ -22,6 +22,18 @@ class RootFSBootTest(linux_boot.LinuxBootTest):
         wan.configure(kind="wan_device")
         if lan:
             lan.configure(kind="lan_device")
+
+        # start tftpd server on appropriate device
+        if self.config.board.get('wan_device', None) is not None:
+            wan.start_tftp_server()
+        else:
+            tftp_servers = [ x['name'] for x in self.config.board['devices'] if 'tftpd-server' in x.get('options', "") ]
+            # start all tftp servers for now
+            for tftp_server in tftp_servers:
+                tftp_device = getattr(self.config, tftp_server)
+                tftp_device.start_tftp_server()
+
+
         board.reset()
         rootfs = None
 
@@ -50,6 +62,8 @@ class RootFSBootTest(linux_boot.LinuxBootTest):
                 # save filename for cases where we didn't flash it
                 # but will use it later to load from memory
                 rootfs = board.flash_rootfs(self.config.ROOTFS)
+            if self.config.NFSROOT:
+                board.prepare_nfsroot(self.config.NFSROOT)
             if self.config.KERNEL:
                 board.flash_linux(self.config.KERNEL)
             # Boot from U-Boot to Linux
@@ -69,20 +83,7 @@ class RootFSBootTest(linux_boot.LinuxBootTest):
                 print("\nFailed to check/set the router's WAN protocol.")
                 pass
         board.wait_for_network()
-
-        # wait for overlay to finish mounting
-        for i in range(5):
-            try:
-                board.sendline('mount')
-                board.expect_exact('overlayfs:/overlay on / type overlay')
-                board.expect(prompt)
-            except:
-                if i == 4:
-                    lib.common.test_msg("WARN: Overlay still not mounted")
-                else:
-                    pass
-            else:
-                break
+        board.wait_for_mounts()
 
         # Router mac addresses are likely to change, so flush arp
         if lan:
@@ -105,7 +106,7 @@ class RootFSBootTest(linux_boot.LinuxBootTest):
             board.sendline("passwd")
             board.expect("New password:", timeout=8)
             board.sendline("password")
-            board.expect("Retype password:")
+            board.expect(["Retype password:", "Re-enter new password:"])
             board.sendline("password")
             board.expect(prompt)
         except:

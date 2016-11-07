@@ -57,6 +57,7 @@ def parse():
     parser.add_argument('-t', '--retry', type=int, default=0, help='How many times to retry every test if it fails')
     parser.add_argument('-k', '--kernel', metavar='', type=str, default=None, help='URL or file PATH of Kernel image to flash')
     parser.add_argument('-r', '--rootfs', metavar='', type=str, default=None, help='URL or file PATH of Rootfs image to flash')
+    parser.add_argument('--nfsroot', metavar='', type=str, default=None, help='URL or file PATH of Rootfs image to flash')
     parser.add_argument('-m', '--meta_img_loc', metavar='', type=str, default=None, help='URL or file PATH to meta image to flash')
     parser.add_argument('-p', '--package', metavar='', type=str, action="append", default=None, help='URL or file PATH of ipk install after boot')
     parser.add_argument('-u', '--uboot', metavar='', type=str, default=None, help=argparse.SUPPRESS)
@@ -133,6 +134,7 @@ def parse():
     config.UBOOT = args.uboot
     config.KERNEL = args.kernel
     config.ROOTFS = args.rootfs
+    config.NFSROOT = args.nfsroot
     config.META_BUILD = args.meta_img_loc
     # Quick check to make sure file url/path arguments are reasonable
     for x in (config.UBOOT, config.KERNEL, config.ROOTFS, config.META_BUILD):
@@ -158,7 +160,7 @@ def parse():
     else:
         if args.extend:
             # One or more test cases was specified at command-line, just boot first.
-            config.TEST_SUITE = "flash_only"
+            config.TEST_SUITE = "flash"
         else:
             # No test suite or test cases specified, so just boot and interact.
             config.TEST_SUITE = "interact"

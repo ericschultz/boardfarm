@@ -32,11 +32,11 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         elif self.model in ("db120", "ap151", "ap152-8M"):
             self.kernel_addr = "0x9f680000"
             self.rootfs_addr = "0x9f050000"
-        elif self.model in ("ap143"):
-            self.kernel_addr = "0x9f400000"
-            self.rootfs_addr = "0x9f050000"
-        else:
-            common.print_bold("Model %s does not have a setting in QcomMipsRouter.check_memory_addresses. Check your model name for typos" % self.model)
+        elif self.model in ("tew-823dru"):
+            self.kernel_addr = "0x9f040000"
+            # rootfs undefined so we throw exception when trying to
+            # write for the time being
+            self.saveenv_safe = False
 
     def flash_rootfs(self, ROOTFS):
         '''Flash Root File System image'''
@@ -59,6 +59,8 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         self.sendline('erase %s +$filesize' % self.rootfs_addr)
         self.expect('Erased .* sectors', timeout=180)
         self.expect(self.uprompt)
+        self.sendline('protect off all')
+        self.expect(self.uprompt)
         self.sendline('cp.b $fileaddr %s $filesize' % self.rootfs_addr)
         self.expect('done', timeout=80)
         if self.model != 'ap143':
@@ -79,7 +81,9 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
             self.expect(self.uprompt)
             return
         self.sendline('erase %s +$filesize' % self.kernel_addr)
-        self.expect('Erased .* sectors', timeout=60)
+        self.expect('Erased .* sectors', timeout=120)
+        self.expect(self.uprompt)
+        self.sendline('protect off all')
         self.expect(self.uprompt)
         self.sendline('cp.b $fileaddr %s $filesize' % self.kernel_addr)
         self.expect('done', timeout=60)
@@ -96,8 +100,9 @@ class QcomMipsRouter(openwrt_router.OpenWrtRouter):
         else:
             self.sendline("setenv bootcmd 'bootm %s'" % self.kernel_addr)
             self.expect(self.uprompt)
-        self.sendline("saveenv")
-        self.expect(self.uprompt)
+        if self.saveenv_safe:
+            self.sendline("saveenv")
+            self.expect(self.uprompt)
         self.sendline("print")
         self.expect(self.uprompt)
         self.sendline("boot")
